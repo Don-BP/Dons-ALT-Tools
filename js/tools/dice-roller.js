@@ -52,7 +52,14 @@ function init() {
         '1': -90, // Normal
         '2': -50, // Floaty
         '3': -20, // Super Floaty
-        '4': -5  // Moon
+        '4': -5   // Moon
+    };
+    // NEW: Define different failsafe timeouts for each gravity level (in milliseconds)
+    const FAILSAFE_TIMEOUTS = {
+        '1': 2500, // Normal: 2.5 seconds
+        '2': 4000, // Floaty: 4 seconds
+        '3': 6000, // Super Floaty: 6 seconds
+        '4': 8000  // Moon: 8 seconds
     };
 
     // --- Setup ---
@@ -211,7 +218,11 @@ function init() {
         clearTimeout(settleTimeout);
         clearTimeout(failsafeTimeout);
         checkIfSettled();
-        failsafeTimeout = setTimeout(showResult, 2500); 
+
+        // MODIFIED: Use the dynamic timeout based on the current gravity selection
+        const gravityLevel = gravitySelect.value;
+        const timeoutDuration = FAILSAFE_TIMEOUTS[gravityLevel] || 2500; // Default to 2.5s if not found
+        failsafeTimeout = setTimeout(showResult, timeoutDuration);
     }
     
     function checkIfSettled() {

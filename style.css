@@ -1690,28 +1690,39 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
 #wb-canvas-wrapper {
     position: relative;
     width: 100%;
-    margin: 0 auto;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background-color: #f0f0f0;
+    min-height: 200px; /* THIS IS THE FIX: Prevents collapsing on mobile */
 }
-#whiteboard-canvas, #whiteboard-temp-canvas {
+
+#wb-canvas-wrapper canvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    /* width, height, top, left are now set by JS via the ResizeObserver */
+    touch-action: none;
 }
+
 #whiteboard-canvas {
     border: 2px solid var(--primary-color);
     border-radius: var(--border-radius);
-    cursor: crosshair;
     background-color: white;
-    touch-action: none;
+    cursor: crosshair;
     z-index: 1;
 }
-#whiteboard-temp-canvas {
-    cursor: crosshair;
-    touch-action: none;
+
+#whiteboard-rainbow-canvas {
     pointer-events: none;
     z-index: 2;
+}
+
+#whiteboard-temp-canvas {
+    cursor: crosshair;
+    pointer-events: none;
+    z-index: 3;
 }
 
 #wb-width {
@@ -1721,7 +1732,6 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     width: 50px;
 }
 
-/* --- Fullscreen & New Whiteboard Features --- */
 #wb-color-palette, #wb-advanced-controls {
     display: none;
 }
@@ -1777,27 +1787,12 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     font-size: 0.9em;
 }
 
-#whiteboard-canvas, #whiteboard-rainbow-canvas, #whiteboard-temp-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#whiteboard-rainbow-canvas {
-    pointer-events: none;
-    z-index: 2;
-}
-
-/* START: New Stamp Control Styles */
 #wb-stamp-controls {
     display: flex;
     gap: 10px;
-    flex-wrap: nowrap; /* Prevents wrapping on desktop */
+    flex-wrap: nowrap;
     align-items: center;
 }
-/* END: New Stamp Control Styles */
 #wb-stamp-controls select {
     max-width: 150px;
 }
@@ -1849,10 +1844,8 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     pointer-events: none;
 }
 .tool-card.fullscreen-mode #wb-canvas-wrapper {
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-    aspect-ratio: auto;
+    border-radius: 0;
+    min-height: auto; /* Remove min-height in fullscreen */
 }
 .tool-card.fullscreen-mode #whiteboard-canvas {
     border: none;
@@ -1865,7 +1858,7 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
         flex-wrap: wrap;
         justify-content: center;
         gap: 10px;
-        padding-top: 15px; /* Add space below fullscreen button */
+        padding-top: 15px;
     }
     
     .tool-card.fullscreen-mode#whiteboard-tool .pen-layout-active #wb-advanced-controls {
@@ -1882,27 +1875,25 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
         justify-content: center;
     }
 
-    /* START: New Mobile Stamp Layout Rules */
     .tool-card.fullscreen-mode#whiteboard-tool #wb-stamp-controls {
-        flex-wrap: wrap; /* Allow wrapping on mobile */
+        flex-wrap: wrap;
         justify-content: center;
     }
 
     .tool-card.fullscreen-mode#whiteboard-tool #wb-stamp-set-select {
-        order: 1; /* First item */
-        flex-grow: 1; /* Take up remaining space on the first line */
+        order: 1;
+        flex-grow: 1;
     }
 
     .tool-card.fullscreen-mode#whiteboard-tool .wb-stamp-size-control {
-        order: 2; /* Second item */
+        order: 2;
     }
 
     .tool-card.fullscreen-mode#whiteboard-tool #wb-stamp-card-container {
-        order: 3; /* Third item */
-        flex-basis: 100%; /* Force to its own line */
-        max-width: none; /* Allow it to span the full width */
+        order: 3;
+        flex-basis: 100%;
+        max-width: none;
     }
-    /* END: New Mobile Stamp Layout Rules */
 }
 
 /* --- START: Spinner Module Styles --- */

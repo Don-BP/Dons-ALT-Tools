@@ -19,7 +19,7 @@ export function initWhiteboard() {
     const wbColorPalette = document.getElementById('wb-color-palette');
     const wbWidthSlider = document.getElementById('wb-width');
     const wbClearBtn = document.getElementById('wb-clear-btn');
-    const wbPaintBtn = document.getElementById('wb-paint-btn'); // New brush button
+    const wbPaintBtn = document.getElementById('wb-paint-btn');
     const wbEraserBtn = document.getElementById('wb-eraser-btn');
     const wbUndoBtn = document.getElementById('wb-undo-btn');
     const wbSaveBtn = document.getElementById('wb-save-btn');
@@ -49,24 +49,32 @@ export function initWhiteboard() {
         '#000000', '#FFFFFF', '#FF3B30', '#FF9500', '#FFCC00',
         '#4CD964', '#34C759', '#5AC8FA', '#007AFF', '#AF52DE'
     ];
-    
+
     function animateRainbow() {
         if (!isRainbowAnimating) return;
         rainbowHue = (rainbowHue + 1) % 360;
         rainbowCtx.clearRect(0, 0, rainbowCanvas.width, rainbowCanvas.height);
         rainbowStrokes.forEach(stroke => {
+            if (!stroke.path || stroke.path.length === 0) return;
             rainbowCtx.beginPath();
-            if (stroke.path.length > 0) {
-                rainbowCtx.moveTo(stroke.path[0].x, stroke.path[0].y);
-                stroke.path.forEach(point => {
-                    rainbowCtx.lineTo(point.x, point.y);
-                });
-                rainbowCtx.strokeStyle = `hsl(${(rainbowHue + stroke.hueOffset) % 360}, 100%, 50%)`;
-                rainbowCtx.lineWidth = stroke.width;
-                rainbowCtx.lineCap = 'round';
-                rainbowCtx.lineJoin = 'round';
-                rainbowCtx.stroke();
-            }
+            rainbowCtx.lineWidth = stroke.width;
+            rainbowCtx.strokeStyle = `hsl(${(rainbowHue + stroke.hueOffset) % 360}, 100%, 50%)`;
+            rainbowCtx.lineCap = 'round';
+            rainbowCtx.lineJoin = 'round';
+            let isPenDown = false;
+            stroke.path.forEach(point => {
+                if (point) {
+                    if (isPenDown) {
+                        rainbowCtx.lineTo(point.x, point.y);
+                    } else {
+                        rainbowCtx.moveTo(point.x, point.y);
+                        isPenDown = true;
+                    }
+                } else {
+                    isPenDown = false;
+                }
+            });
+            rainbowCtx.stroke();
         });
         requestAnimationFrame(animateRainbow);
     }
@@ -74,22 +82,16 @@ export function initWhiteboard() {
     function getEventPosition(event) {
         const rect = canvas.getBoundingClientRect();
         const touch = event.touches && event.touches[0];
-        return { x: (touch ? touch.clientX : event.clientX) - rect.left, y: (touch ? touch.clientY : event.clientY) - rect.top };
+        const clientX = touch ? touch.clientX : event.clientX;
+        const clientY = touch ? touch.clientY : event.clientY;
+
+        const x = (clientX - rect.left) * (canvas.width / rect.width);
+        const y = (clientY - rect.top) * (canvas.height / rect.height);
+
+        return { x, y };
     }
 
-    function setGridAspectRatio() {
-        if (toolCard.classList.contains('fullscreen-mode')) {
-            canvasWrapper.style.aspectRatio = '';
-            return;
-        }
-        canvasWrapper.style.aspectRatio = `${window.innerWidth} / ${window.innerHeight}`;
-    }
-
-    /**
-     * Toggles CSS classes on the controls container for responsive layout adjustments.
-     */
     function updateLayoutClasses() {
-        // The special "pen layout" is active when we are NOT erasing and the shape is NOT a stamp.
         const isPenLayout = !isErasing && currentShape !== 'stamp';
         whiteboardControls.classList.toggle('pen-layout-active', isPenLayout);
     }
@@ -120,10 +122,28 @@ export function initWhiteboard() {
         }
     }
     
+    function eraseRainbowAtPoint(pos) {
+        const eraserRadius = wbWidthSlider.value;
+        rainbowStrokes.forEach(stroke => {
+            if (!stroke.path) return;
+            stroke.path.forEach((point, index) => {
+                if (!point) return;
+                const dx = point.x - pos.x;
+                const dy = point.y - pos.y;
+                if (Math.sqrt(dx * dx + dy * dy) < eraserRadius) {
+                    stroke.path[index] = null;
+                }
+            });
+        });
+    }
+
     function draw(e) {
         if (!isDrawing) return;
         e.preventDefault();
         const pos = getEventPosition(e);
+        if (isErasing) {
+            eraseRainbowAtPoint(pos);
+        }
         if (currentShape !== 'pen') {
             updateContextStyle(tempCtx);
             tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
@@ -149,6 +169,32 @@ export function initWhiteboard() {
         }
     }
 
+    function densifyPath(path) {
+        if (!path || path.length < 2) return path;
+        const newPath = [path[0]];
+        const maxSegmentLength = 2;
+        for (let i = 0; i < path.length - 1; i++) {
+            const p1 = path[i];
+            const p2 = path[i+1];
+            if (!p1 || !p2) {
+                newPath.push(p2);
+                continue;
+            }
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist > maxSegmentLength) {
+                const numSegments = Math.ceil(dist / maxSegmentLength);
+                for (let j = 1; j < numSegments; j++) {
+                    const t = j / numSegments;
+                    newPath.push({ x: p1.x + dx * t, y: p1.y + dy * t });
+                }
+            }
+            newPath.push(p2);
+        }
+        return newPath;
+    }
+
     function stopDrawing(e) {
         if (!isDrawing) return;
         isDrawing = false;
@@ -158,6 +204,9 @@ export function initWhiteboard() {
             drawShape(ctx, pos.x, pos.y);
             tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
         } else if (currentBrush === 'rainbow' && !isErasing) {
+            if (currentRainbowStroke && currentRainbowStroke.path.length > 1) {
+                 currentRainbowStroke.path = densifyPath(currentRainbowStroke.path);
+            }
             currentRainbowStroke = null;
         } else {
             ctx.closePath();
@@ -262,7 +311,7 @@ export function initWhiteboard() {
     function handleFullscreenChange(isFullscreen) {
         wbColorPalette.style.display = isFullscreen ? 'grid' : 'none';
         wbAdvancedControls.style.display = isFullscreen ? 'flex' : 'none';
-        setGridAspectRatio();
+        // The ResizeObserver will automatically handle the visual change.
     }
 
     async function populateStampSelectors() {
@@ -279,7 +328,7 @@ export function initWhiteboard() {
     function populateStampGrid(deckName) {
         wbStampCardContainer.innerHTML = '';
         currentStampImage = null;
-        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height); // Clear any stamp preview
+        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     
         if (!deckName || !flashcardDecks[deckName] || !Array.isArray(flashcardDecks[deckName])) {
             wbStampCardContainer.innerHTML = `<p class="wb-stamp-placeholder">Select a set to view stamps.</p>`;
@@ -347,7 +396,7 @@ export function initWhiteboard() {
 
     wbEraserBtn.addEventListener('click', () => {
         isErasing = true;
-        currentShape = 'pen'; // FIX: Eraser should act like a pen
+        currentShape = 'pen'; 
         currentBrush = 'solid';
         wbShapeTool.value = 'pen';
         wbBrushTool.value = 'solid';
@@ -361,7 +410,7 @@ export function initWhiteboard() {
 
     wbShapeTool.addEventListener('change', (e) => {
         currentShape = e.target.value;
-        isErasing = false; // Selecting any tool exits erasing mode
+        isErasing = false; 
         wbEraserBtn.classList.remove('active');
         wbPaintBtn.classList.add('active');
         if (currentShape === 'stamp') {
@@ -399,21 +448,26 @@ export function initWhiteboard() {
         isRainbowAnimating = false;
         saveWbState();
     });
-
+    
     wbUndoBtn.addEventListener('click', () => {
         if (wbHistory.length > 1) {
             wbHistory.pop();
             const lastState = wbHistory[wbHistory.length - 1];
             rainbowStrokes = JSON.parse(JSON.stringify(lastState.dynamic));
-            if (rainbowStrokes.length === 0) {
+            
+            if (rainbowStrokes.length === 0 && isRainbowAnimating) {
                 isRainbowAnimating = false;
                 rainbowCtx.clearRect(0, 0, rainbowCanvas.width, rainbowCanvas.height);
+            } else if (rainbowStrokes.length > 0 && !isRainbowAnimating) {
+                isRainbowAnimating = true;
+                animateRainbow();
             }
+
             const img = new Image();
             img.src = lastState.static;
             img.onload = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.clientWidth, canvas.clientHeight);
+                ctx.drawImage(img, 0, 0);
             };
             wbUndoBtn.disabled = wbHistory.length <= 1;
         }
@@ -450,38 +504,38 @@ export function initWhiteboard() {
         tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     });
 
-    window.addEventListener('resize', setGridAspectRatio);
-
+    /**
+     * The new robust ResizeObserver. It fits the canvas elements inside the
+     * wrapper while maintaining their fixed aspect ratio, preventing stretching.
+     */
     const resizeObserver = new ResizeObserver(entries => {
         const entry = entries[0];
-        const { width, height } = entry.contentRect;
-        const dpr = window.devicePixelRatio || 1;
-        const lastState = wbHistory.length > 0 ? wbHistory[wbHistory.length - 1] : null;
+        const wrapperWidth = entry.contentRect.width;
+        const wrapperHeight = entry.contentRect.height;
+        
+        const canvasRatio = canvas.width / canvas.height;
+        const wrapperRatio = wrapperWidth / wrapperHeight;
+
+        let styleWidth, styleHeight, styleTop, styleLeft;
+
+        if (wrapperRatio > canvasRatio) { // Wrapper is wider than canvas -> pillarbox
+            styleHeight = wrapperHeight;
+            styleWidth = wrapperHeight * canvasRatio;
+            styleTop = 0;
+            styleLeft = (wrapperWidth - styleWidth) / 2;
+        } else { // Wrapper is taller or same ratio -> letterbox
+            styleWidth = wrapperWidth;
+            styleHeight = wrapperWidth / canvasRatio;
+            styleLeft = 0;
+            styleTop = (wrapperHeight - styleHeight) / 2;
+        }
+
         [canvas, rainbowCanvas, tempCanvas].forEach(c => {
-            c.width = width * dpr;
-            c.height = height * dpr;
-            c.getContext('2d').scale(dpr, dpr);
+            c.style.width = `${styleWidth}px`;
+            c.style.height = `${styleHeight}px`;
+            c.style.top = `${styleTop}px`;
+            c.style.left = `${styleLeft}px`;
         });
-        const smallerDim = Math.min(width, height);
-        const maxStampSize = Math.floor(smallerDim * 1);
-        wbStampSizeSlider.max = Math.max(20, maxStampSize);
-        if (parseInt(wbStampSizeSlider.value) > wbStampSizeSlider.max) {
-            wbStampSizeSlider.value = wbStampSizeSlider.max;
-        }
-        updateContextStyle();
-        if (lastState) {
-            rainbowStrokes = JSON.parse(JSON.stringify(lastState.dynamic));
-            if (rainbowStrokes.length > 0 && !isRainbowAnimating) {
-                isRainbowAnimating = true;
-                animateRainbow();
-            }
-            const img = new Image();
-            img.src = lastState.static;
-            img.onload = () => {
-                ctx.clearRect(0, 0, width, height);
-                ctx.drawImage(img, 0, 0, width, height);
-            };
-        }
     });
     
     const fullscreenObserver = new MutationObserver((mutations) => {
@@ -495,16 +549,32 @@ export function initWhiteboard() {
 
     // --- Initialization ---
     (async () => {
+        const initialWidth = window.innerWidth;
+        const initialHeight = window.innerHeight;
+        
+        [canvas, rainbowCanvas, tempCanvas].forEach(c => {
+            c.width = initialWidth;
+            c.height = initialHeight;
+        });
+        
+        const smallerDim = Math.min(initialWidth, initialHeight);
+        const maxStampSize = Math.floor(smallerDim * 0.8);
+        wbStampSizeSlider.max = Math.max(20, maxStampSize);
+        wbStampSizeSlider.value = Math.min(parseInt(wbStampSizeSlider.value), maxStampSize);
+
         await populateStampSelectors();
-        populateStampGrid(''); // Initialize with placeholder
+        populateStampGrid(''); 
     })();
+
     createColorPalette();
     resizeObserver.observe(canvasWrapper);
     fullscreenObserver.observe(toolCard, { attributes: true });
-    setGridAspectRatio();
-    wbPaintBtn.classList.add('active'); // Start with paint button active
+    wbPaintBtn.classList.add('active'); 
     updateLayoutClasses();
+
     setTimeout(() => {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         updateContextStyle();
         saveWbState();
     }, 100);
