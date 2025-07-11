@@ -346,8 +346,8 @@ const ThemedScoreboard = {
                 <div class="score-number">${this.state.scores[teamId]}</div>
             </div>
             <div class="team-controls">
-                <button class="point-btn minus" data-amount="-1">-</button>
-                <button class="point-btn plus" data-amount="1">+</button>
+                <button class="point-btn minus" data-amount="-1">🔽</button>
+                <button class="point-btn plus" data-amount="1">🔼</button>
             </div>`;
         card.querySelector('.name-text').style.color = teamColor;
         this.themeHandlers.update(this.state.activeTheme, card, this.state.scores[teamId], null);
