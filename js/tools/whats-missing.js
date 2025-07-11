@@ -9,6 +9,7 @@ export function initWhatsMissing() {
     const wmStartBtn = document.getElementById('whats-missing-start-btn');
     const wmDifficultySelect = document.getElementById('whats-missing-difficulty');
     const wmCardCountSelect = document.getElementById('wm-card-count');
+    const wmCustomCardCountInput = document.getElementById('wm-custom-card-count');
     const wmMissingCountSelect = document.getElementById('wm-missing-count');
 
     let wmMissingItems = [];
@@ -39,7 +40,18 @@ export function initWhatsMissing() {
     }
 
     async function wmStartGame() {
-        const cardCount = parseInt(wmCardCountSelect.value, 10);
+        // Determine the number of cards, checking for custom input
+        let cardCount;
+        if (wmCardCountSelect.value === 'custom') {
+            cardCount = parseInt(wmCustomCardCountInput.value, 10);
+            if (isNaN(cardCount) || cardCount < 2 || cardCount > 50) {
+                wmStatus.textContent = 'Please enter a valid custom card count (2-50).';
+                return;
+            }
+        } else {
+            cardCount = parseInt(wmCardCountSelect.value, 10);
+        }
+
         const missingCount = parseInt(wmMissingCountSelect.value, 10);
         const difficultySettings = { easy: 6000, normal: 4000, hard: 2500 };
         const category = wmCategorySelect.value;
@@ -68,7 +80,11 @@ export function initWhatsMissing() {
         wmStartBtn.textContent = 'Start Game';
         wmStartBtn.disabled = true;
         wmGrid.innerHTML = '';
-        wmGrid.className = 'whats-missing-grid count-' + cardCount;
+
+        // Dynamically set grid layout instead of using fixed CSS classes
+        wmGrid.className = 'whats-missing-grid';
+        const cols = Math.ceil(Math.sqrt(cardCount));
+        wmGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
         for (let i = deck.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -116,4 +132,10 @@ export function initWhatsMissing() {
 
     wmStartBtn.addEventListener('click', wmStartGame);
     wmGrid.addEventListener('click', wmRevealAnswer);
+
+    // Event listener to show/hide the custom input field
+    wmCardCountSelect.addEventListener('change', () => {
+        const isCustom = wmCardCountSelect.value === 'custom';
+        wmCustomCardCountInput.classList.toggle('hidden', !isCustom);
+    });
 }

@@ -11,7 +11,7 @@
 <body>
 
     <header>
-        <h1>Brain Power ALT Classroom Tools</h1>
+        <h1>Don's ALT Classroom Tools</h1>
         <p>Simple tools to make your lessons great!</p>
         <button id="mute-btn" title="Toggle Sound">🔊</button>
     </header>
@@ -392,7 +392,11 @@
                         <option value="4">4</option>
                         <option value="6" selected>6</option>
                         <option value="9">9</option>
+                        <option value="12">12</option>
+                        <option value="15">15</option>
+                        <option value="custom">Custom</option>
                     </select>
+                    <input type="number" id="wm-custom-card-count" class="hidden" min="2" max="50" value="12" style="width: 70px; padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
                 </div>
                 <div class="flashcard-controls">
                     <label for="wm-missing-count">Missing:</label>
@@ -493,26 +497,20 @@
 
             <!-- Grid View Content -->
             <div id="spinner-grid-view">
-                <div class="config-section">
-                    <div class="config-block">
-                        <h3>Load from Flashcards</h3>
-                        <select id="spinner-flashcard-select">
-                            <option value="">-- Manual List --</option>
-                        </select>
-                    </div>
-                     <div class="config-block">
-                         <h3>Add/Remove Items</h3>
-                         <div class="add-word-form">
-                             <input type="text" id="spinner-word-input" placeholder="Enter word or phrase">
-                             <input type="file" id="spinner-segment-image-input" accept="image/*" style="display: none;">
-                             <label for="spinner-segment-image-input" class="upload-button small-upload-btn" title="Add image to this item">🖼️</label>
-                             <button id="spinner-add-word-button">Add</button>
-                         </div>
-                         <div id="spinner-segment-image-preview" class="image-preview-area"></div>
-                         <h4>Current Items:</h4>
-                         <ul id="spinner-word-list" class="word-list item-list"></ul>
-                     </div>
+                <div class="spinner-grid-top-controls">
+                    <label for="spinner-flashcard-select">Category:</label>
+                    <select id="spinner-flashcard-select">
+                        <option value="">-- Manual List --</option>
+                    </select>
                 </div>
+                <div class="spinner-display-wrapper">
+                    <div class="spinner-container-grid" id="spinner-container-grid">
+                        <div class="spinner-wheel-grid" id="spinner-wheel-grid"></div>
+                    </div>
+                </div>
+                <!-- This is now a separate element in the layout flow -->
+                <div id="spinner-result-display-grid" class="result-display" aria-live="polite"></div>
+                <button id="spinner-spin-button-grid" class="spin-button-grid">SPIN!</button>
             </div>
 
             <!-- Fullscreen View Content (initially hidden) -->
@@ -611,12 +609,9 @@
         <div class="tool-card" id="whiteboard-tool">
             <h2>Simple Whiteboard</h2>
             <div class="whiteboard-controls">
+                <!-- Main tools visible on desktop and mobile row 1 -->
                 <input type="color" id="wb-color" value="#000000">
-                <div id="wb-color-palette"></div>
-
-                <label for="wb-width">Width:</label>
                 <input type="range" id="wb-width" min="1" max="150" value="10">
-
                 <div class="wb-tool-group">
                     <label for="wb-shape-tool">Paint:</label>
                     <select id="wb-shape-tool">
@@ -628,9 +623,10 @@
                         <option value="stamp">Stamp</option>
                     </select>
                 </div>
-                <button id="wb-eraser-btn" class="wb-util-btn">Eraser</button>
 
+                <!-- This wrapper is required by JS. It contains tools for mobile row 2. -->
                 <div id="wb-advanced-controls">
+                    <div id="wb-color-palette"></div>
                     <div class="wb-tool-group">
                         <label for="wb-brush-tool">Brush:</label>
                         <select id="wb-brush-tool">
@@ -641,32 +637,40 @@
                             <option value="dotted">Dotted</option>
                         </select>
                     </div>
-                    <!-- Container for ALL stamp-specific controls -->
-                    <div id="wb-stamp-controls" class="hidden">
-                         <select id="wb-stamp-set-select">
-                            <option>Loading Sets...</option>
-                         </select>
-                         <select id="wb-stamp-card-select">
-                            <option value="">Select a card...</option>
-                         </select>
-                         <div class="wb-tool-group">
-                            <label for="wb-stamp-size">Size:</label>
-                            <input type="range" id="wb-stamp-size" min="20" max="300" value="100">
-                         </div>
+                </div>
+                
+                <!-- START: HTML for stamp controls has been simplified -->
+                <div id="wb-stamp-controls" class="hidden">
+                    <select id="wb-stamp-set-select">
+                        <option>Loading Sets...</option>
+                    </select>
+                    <div id="wb-stamp-card-container" class="wb-stamp-selection-grid">
+                        <!-- JS will populate this -->
+                    </div>
+                    <div class="wb-tool-group wb-stamp-size-control">
+                        <label for="wb-stamp-size">Size:</label>
+                        <input type="range" id="wb-stamp-size" min="20" max="300" value="100">
                     </div>
                 </div>
+                <!-- END: HTML for stamp controls simplified -->
 
-                <button id="wb-clear-btn" class="wb-util-btn">Clear</button>
-                <button id="wb-undo-btn" class="wb-util-btn" disabled>Undo</button>
-                <button id="wb-save-btn" class="wb-util-btn">Save Image</button>
+                <!-- Action buttons that form mobile row 3 -->
+                <div class="wb-actions-group">
+                    <button id="wb-paint-btn" class="wb-util-btn" title="Paint Brush">🖌️</button>  
+                    <button id="wb-eraser-btn" class="wb-util-btn" title="Eraser">🧽</button>   
+                    <button id="wb-undo-btn" class="wb-util-btn" disabled>Undo</button>
+                    <button id="wb-clear-btn" class="wb-util-btn">🗑️</button>
+                    <button id="wb-save-btn" class="wb-util-btn">💾</button>
+                </div>
             </div>
             <div id="wb-canvas-wrapper">
                 <canvas id="whiteboard-canvas"></canvas>
-                <!-- NEW: Canvas layer for animated rainbow strokes -->
                 <canvas id="whiteboard-rainbow-canvas"></canvas>
                 <canvas id="whiteboard-temp-canvas"></canvas>
             </div>
         </div>
+
+<!-- Flashcard Manager -->
 
         <!-- Flashcard Manager -->
         <div class="tool-card">
@@ -681,7 +685,7 @@
                 </div>
                 <div class="fm-row">
                     <input type="text" id="fm-card-text" placeholder="Card Text (e.g., Dog)">
-                    <input type="file" id="fm-card-img" accept="image/*">
+                    <input type="file" id="fm-card-img" accept="image/*" multiple>
                     <button id="fm-add-card-btn">Add Card</button>
                 </div>
                  <!-- START: New Import/Export Row -->

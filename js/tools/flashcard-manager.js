@@ -22,26 +22,54 @@ export function initFlashcardManager() {
         currentCards.forEach((card, index) => {
             const cardItem = document.createElement('div');
             cardItem.className = 'fm-card-item';
-
-            const cardInfo = document.createElement('span');
-            let displayText = card.text || '[Image Only]';
-            if (card.image && card.text) {
-                displayText += ' (image)';
-            } else if (card.image && !card.text) {
-                displayText = '[Image Only]';
+    
+            // Wrapper for thumbnail and text
+            const cardDetails = document.createElement('div');
+            cardDetails.className = 'fm-card-details';
+    
+            if (card.image) {
+                const thumbnail = document.createElement('img');
+                thumbnail.src = card.image;
+                thumbnail.className = 'fm-card-thumbnail';
+                thumbnail.alt = 'Card thumbnail';
+                cardDetails.appendChild(thumbnail);
             }
-            cardInfo.textContent = displayText;
-
+    
+            const cardName = document.createElement('span');
+            cardName.className = 'fm-card-name';
+            cardName.textContent = card.text || '[Image Only]';
+            cardDetails.appendChild(cardName);
+    
+            // Wrapper for buttons
+            const cardActions = document.createElement('div');
+            cardActions.className = 'fm-card-actions';
+    
+            const renameBtn = document.createElement('button');
+            renameBtn.textContent = 'Rename';
+            renameBtn.className = 'fm-rename-btn';
+            renameBtn.title = `Rename ${card.text || 'this card'}`;
+            renameBtn.addEventListener('click', () => {
+                const newName = prompt('Enter new text for this card:', card.text || '');
+                if (newName !== null) { // Handle clicking "Cancel"
+                    card.text = newName.trim();
+                    updateCardListView();
+                }
+            });
+    
             const removeBtn = document.createElement('button');
             removeBtn.textContent = 'Remove';
+            removeBtn.className = 'fm-remove-btn';
             removeBtn.title = `Remove ${card.text || 'this card'}`;
             removeBtn.addEventListener('click', () => {
                 currentCards.splice(index, 1);
                 updateCardListView();
             });
-
-            cardItem.appendChild(cardInfo);
-            cardItem.appendChild(removeBtn);
+    
+            cardActions.appendChild(renameBtn);
+            cardActions.appendChild(removeBtn);
+    
+            cardItem.appendChild(cardDetails);
+            cardItem.appendChild(cardActions);
             currentCardsContainer.appendChild(cardItem);
         });
     }
@@ -79,31 +107,47 @@ export function initFlashcardManager() {
     setSelect.addEventListener('change', loadSet);
 
     addCardBtn.addEventListener('click', () => {
-        const text = cardTextInput.value.trim();
-        const imgFile = cardImgInput.files[0];
+    const text = cardTextInput.value.trim();
+    const imgFiles = cardImgInput.files;
 
-        if (!text && !imgFile) {
-            alert('Please provide text or an image for the card.');
-            return;
-        }
+    if (!text && imgFiles.length === 0) {
+        alert('Please provide text or select at least one image file.');
+        return;
+    }
 
-        const newCard = { text: text };
+    if (imgFiles.length > 0) {
+        // Create a promise for each file reading operation.
+        const readPromises = Array.from(imgFiles).map(file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    // If only one image is selected, use the text from the input field.
+                    // If multiple images are selected, each gets its own card with no text.
+                    const cardText = (imgFiles.length === 1) ? text : '';
+                    resolve({ text: cardText, image: e.target.result });
+                };
+                reader.onerror = err => reject(err);
+                reader.readAsDataURL(file);
+            });
+        });
 
-        if (imgFile) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                newCard.image = e.target.result;
-                currentCards.push(newCard);
-                updateCardListView();
-                clearCardInputs();
-            };
-            reader.readAsDataURL(imgFile);
-        } else {
-            currentCards.push(newCard);
-            updateCardListView();
-            clearCardInputs();
-        }
-    });
+        // Once all files have been read successfully...
+        Promise.all(readPromises).then(newCards => {
+            currentCards.push(...newCards); // Add all new cards to the list
+            updateCardListView(); // Update the UI once
+            clearCardInputs(); // Clear inputs once
+        }).catch(error => {
+            console.error('Error reading image files:', error);
+            alert('There was an error processing one or more of the images.');
+        });
+
+    } else {
+        // This block handles the case of a text-only card.
+        currentCards.push({ text: text });
+        updateCardListView();
+        clearCardInputs();
+    }
+});
     
     saveSetBtn.addEventListener('click', async () => {
         const setName = setNameInput.value.trim();

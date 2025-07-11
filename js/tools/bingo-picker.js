@@ -62,7 +62,8 @@ export function initBingoPicker() {
         } else if (selectedSource) {
             const allDecks = await getAvailableFlashcardDecks();
             const deck = allDecks[selectedSource] || [];
-            bingoPool = [...deck].filter(card => card.text && card.text.trim() !== '');
+            // FIX: Allow cards with text OR an image, not just text.
+            bingoPool = [...deck].filter(card => (card.text && card.text.trim() !== '') || card.image);
         }
         
         for (let i = bingoPool.length - 1; i > 0; i--) {

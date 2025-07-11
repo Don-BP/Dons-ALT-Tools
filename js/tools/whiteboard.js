@@ -5,6 +5,7 @@ import { getAvailableFlashcardDecks } from '../utils.js';
 
 export function initWhiteboard() {
     const toolCard = document.getElementById('whiteboard-tool');
+    const whiteboardControls = toolCard.querySelector('.whiteboard-controls');
     const canvasWrapper = document.getElementById('wb-canvas-wrapper');
     const canvas = document.getElementById('whiteboard-canvas');
     const rainbowCanvas = document.getElementById('whiteboard-rainbow-canvas');
@@ -18,6 +19,7 @@ export function initWhiteboard() {
     const wbColorPalette = document.getElementById('wb-color-palette');
     const wbWidthSlider = document.getElementById('wb-width');
     const wbClearBtn = document.getElementById('wb-clear-btn');
+    const wbPaintBtn = document.getElementById('wb-paint-btn'); // New brush button
     const wbEraserBtn = document.getElementById('wb-eraser-btn');
     const wbUndoBtn = document.getElementById('wb-undo-btn');
     const wbSaveBtn = document.getElementById('wb-save-btn');
@@ -26,7 +28,7 @@ export function initWhiteboard() {
     const wbBrushTool = document.getElementById('wb-brush-tool');
     const wbStampControls = document.getElementById('wb-stamp-controls');
     const wbStampSetSelect = document.getElementById('wb-stamp-set-select');
-    const wbStampCardSelect = document.getElementById('wb-stamp-card-select');
+    const wbStampCardContainer = document.getElementById('wb-stamp-card-container');
     const wbStampSizeSlider = document.getElementById('wb-stamp-size');
 
     // --- State ---
@@ -83,6 +85,15 @@ export function initWhiteboard() {
         canvasWrapper.style.aspectRatio = `${window.innerWidth} / ${window.innerHeight}`;
     }
 
+    /**
+     * Toggles CSS classes on the controls container for responsive layout adjustments.
+     */
+    function updateLayoutClasses() {
+        // The special "pen layout" is active when we are NOT erasing and the shape is NOT a stamp.
+        const isPenLayout = !isErasing && currentShape !== 'stamp';
+        whiteboardControls.classList.toggle('pen-layout-active', isPenLayout);
+    }
+
     // --- Drawing Logic ---
     function startDrawing(e) {
         isDrawing = true;
@@ -90,7 +101,7 @@ export function initWhiteboard() {
         startX = pos.x;
         startY = pos.y;
         
-        if (currentBrush === 'rainbow' && currentShape === 'pen') {
+        if (currentBrush === 'rainbow' && currentShape === 'pen' && !isErasing) {
             currentRainbowStroke = {
                 path: [{ x: startX, y: startY }],
                 width: wbWidthSlider.value,
@@ -119,9 +130,9 @@ export function initWhiteboard() {
             drawShape(tempCtx, pos.x, pos.y);
             return;
         }
-        if (currentBrush === 'rainbow') {
-            currentRainbowStroke.path.push({ x: pos.x, y: pos.y });
-        } else if (currentBrush === 'spray') {
+        if (currentBrush === 'rainbow' && !isErasing) {
+            if (currentRainbowStroke) currentRainbowStroke.path.push({ x: pos.x, y: pos.y });
+        } else if (currentBrush === 'spray' && !isErasing) {
             const sprayRadius = wbWidthSlider.value / 2;
             const sprayDensity = 50;
             ctx.fillStyle = isErasing ? 'white' : wbColorPicker.value;
@@ -146,7 +157,7 @@ export function initWhiteboard() {
             updateContextStyle(ctx);
             drawShape(ctx, pos.x, pos.y);
             tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-        } else if (currentBrush === 'rainbow' && currentShape === 'pen') {
+        } else if (currentBrush === 'rainbow' && !isErasing) {
             currentRainbowStroke = null;
         } else {
             ctx.closePath();
@@ -265,31 +276,55 @@ export function initWhiteboard() {
         }
     }
     
-    function updateStampCardSelector(deckName) {
-        wbStampCardSelect.innerHTML = '';
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = 'Select a card...';
-        wbStampCardSelect.appendChild(placeholder);
+    function populateStampGrid(deckName) {
+        wbStampCardContainer.innerHTML = '';
         currentStampImage = null;
-        if (!deckName || !flashcardDecks[deckName] || !Array.isArray(flashcardDecks[deckName])) return;
+        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height); // Clear any stamp preview
+    
+        if (!deckName || !flashcardDecks[deckName] || !Array.isArray(flashcardDecks[deckName])) {
+            wbStampCardContainer.innerHTML = `<p class="wb-stamp-placeholder">Select a set to view stamps.</p>`;
+            return;
+        }
+    
         const deck = flashcardDecks[deckName];
-        let cardsAdded = 0;
-        deck.forEach(card => {
-            if (card && card.image) {
-                const option = document.createElement('option');
-                option.value = card.image;
-                option.textContent = card.text || 'Untitled Card';
-                wbStampCardSelect.appendChild(option);
-                cardsAdded++;
-            }
+        const imageCards = deck.filter(card => card && card.image);
+    
+        if (imageCards.length === 0) {
+            wbStampCardContainer.innerHTML = `<p class="wb-stamp-placeholder">No images in this set.</p>`;
+            return;
+        }
+    
+        imageCards.forEach(card => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'wb-stamp-preview-item';
+            previewItem.title = card.text || 'Image stamp';
+    
+            const img = document.createElement('img');
+            img.src = card.image;
+            img.alt = previewItem.title;
+            previewItem.appendChild(img);
+    
+            previewItem.addEventListener('click', () => {
+                const currentActive = wbStampCardContainer.querySelector('.active');
+                if (currentActive) {
+                    currentActive.classList.remove('active');
+                }
+                previewItem.classList.add('active');
+    
+                const stampImg = new Image();
+                stampImg.crossOrigin = "anonymous";
+                stampImg.onload = () => {
+                    currentStampImage = stampImg;
+                };
+                stampImg.src = card.image;
+            });
+    
+            wbStampCardContainer.appendChild(previewItem);
         });
-        if (cardsAdded === 0) placeholder.textContent = 'No images in this set';
     }
 
-    // --- NEW: Master handler for mouse/touch down events ---
     function masterDownHandler(e) {
-        if (e.button && e.button !== 0) return; // Ignore right-clicks
+        if (e.button && e.button !== 0) return; 
         
         if (currentShape === 'stamp') {
             handleStamp(e);
@@ -299,52 +334,62 @@ export function initWhiteboard() {
     }
 
     // --- Event Listeners ---
+    wbPaintBtn.addEventListener('click', () => {
+        isErasing = false;
+        wbEraserBtn.classList.remove('active');
+        wbPaintBtn.classList.add('active');
+        if (currentShape === 'stamp') {
+             wbStampControls.classList.remove('hidden');
+        }
+        updateLayoutClasses();
+        updateContextStyle();
+    });
+
     wbEraserBtn.addEventListener('click', () => {
         isErasing = true;
-        currentShape = '';
+        currentShape = 'pen'; // FIX: Eraser should act like a pen
         currentBrush = 'solid';
         wbShapeTool.value = 'pen';
         wbBrushTool.value = 'solid';
         wbEraserBtn.classList.add('active');
+        wbPaintBtn.classList.remove('active');
         wbStampControls.classList.add('hidden');
         tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+        updateLayoutClasses();
         updateContextStyle();
     });
 
     wbShapeTool.addEventListener('change', (e) => {
         currentShape = e.target.value;
-        isErasing = false;
+        isErasing = false; // Selecting any tool exits erasing mode
         wbEraserBtn.classList.remove('active');
+        wbPaintBtn.classList.add('active');
         if (currentShape === 'stamp') {
             wbStampControls.classList.remove('hidden');
         } else {
             wbStampControls.classList.add('hidden');
             tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
         }
+        updateLayoutClasses();
         updateContextStyle();
     });
 
     wbBrushTool.addEventListener('change', (e) => {
         currentBrush = e.target.value;
+        isErasing = false;
+        wbEraserBtn.classList.remove('active');
+        wbPaintBtn.classList.add('active');
         updateContextStyle();
     });
 
-    wbStampSetSelect.addEventListener('change', (e) => updateStampCardSelector(e.target.value));
+    wbStampSetSelect.addEventListener('change', (e) => populateStampGrid(e.target.value));
     
-    wbStampCardSelect.addEventListener('change', (e) => {
-        const imageUrl = e.target.value;
-        if (imageUrl) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => { currentStampImage = img; };
-            img.src = imageUrl;
-        } else {
-            currentStampImage = null;
-            tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-        }
+    wbColorPicker.addEventListener('input', () => {
+        isErasing = false;
+        wbEraserBtn.classList.remove('active');
+        wbPaintBtn.classList.add('active');
+        updateContextStyle();
     });
-    
-    wbColorPicker.addEventListener('input', () => updateContextStyle());
     wbWidthSlider.addEventListener('input', () => updateContextStyle());
 
     wbClearBtn.addEventListener('click', () => {
@@ -390,7 +435,6 @@ export function initWhiteboard() {
         playSound('sounds/reveal.mp3');
     });
 
-    // --- MODIFIED: Event listeners now use the master handler for down events ---
     ['mousedown', 'touchstart'].forEach(evt => {
         canvas.addEventListener(evt, masterDownHandler, { passive: false });
     });
@@ -452,11 +496,14 @@ export function initWhiteboard() {
     // --- Initialization ---
     (async () => {
         await populateStampSelectors();
+        populateStampGrid(''); // Initialize with placeholder
     })();
     createColorPalette();
     resizeObserver.observe(canvasWrapper);
     fullscreenObserver.observe(toolCard, { attributes: true });
     setGridAspectRatio();
+    wbPaintBtn.classList.add('active'); // Start with paint button active
+    updateLayoutClasses();
     setTimeout(() => {
         updateContextStyle();
         saveWbState();

@@ -383,9 +383,8 @@ function toggleFullscreen(card) {
             gridView.classList.toggle('hidden', isFullscreen);
             fullscreenView.classList.toggle('hidden', !isFullscreen);
         }
-        if (isFullscreen) {
-            window.dispatchEvent(new Event('resize'));
-        }
+        // Fire resize on BOTH enter and exit to force spinner to recalculate its size.
+        window.dispatchEvent(new Event('resize'));
     }
 
     if (card.id === 'dice-roller-tool') {
