@@ -1,0 +1,69 @@
+/* --- Spring Theme --- */
+body.theme-spring { --body-bg-gradient: linear-gradient(to bottom, #fce4ec 0%, #f8bbd0 100%); background-image: var(--body-bg-gradient); }
+.theme-spring-card { background: linear-gradient(145deg, #ffffff 60%, #e6ee9c 100%); border: 3px solid #ec407a; box-shadow: 0 8px 25px rgba(236, 64, 122, 0.2), 0 0 10px rgba(255, 241, 244, 0.5) inset; }
+.theme-spring-card .team-name-display .name-text { color: #ad1457; }
+.theme-spring-card .team-name-display { background-color: rgba(240, 133, 172, 0.6); }
+
+/* .score-display inherits height, adjust alignment */
+.theme-spring-card .score-display {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end; /* Keep vine at bottom */
+}
+.spring-visual {
+    width: 100%; /* Full width */
+    height: 300px; /* Adjusted height */
+    position: relative;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Align vine to bottom */
+}
+.spring-vine {
+    width: 15px;
+    background: linear-gradient(to top, #558b2f, #8bc34a);
+    border-radius: 10px 10px 0 0;
+    height: 0%; /* Controlled by JS */
+    transition: height 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+.spring-flowers {
+    position: absolute;
+    /* Position relative to the taller spring-visual */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px; /* Slightly wider */
+    height: 100%; /* Takes height of visual */
+    pointer-events: none;
+    z-index: 2;
+}
+.theme-item.flower {
+    font-size: 1.8em;
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.5);
+    /* Position set by JS, should adapt to taller container */
+    animation: bloom 0.6s ease-out 0.1s forwards;
+}
+@keyframes bloom { from { opacity: 0; transform: scale(0.5) rotate(-45deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
+.theme-item.animate-shrink { animation: wilt 0.4s ease-in forwards; }
+@keyframes wilt { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.3) rotate(30deg); } }
+
+/* Theme-specific score number color */
+.theme-spring-card .score-number { color: #880e4f; }
+
+/* Counter badge positioning relative to visual container */
+.item-count-badge { position: absolute; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.6); color: #fff; padding: 3px 8px; border-radius: 10px; font-size: 0.9em; display: none; z-index: 15; }
+
+.theme-spring-card.spring-winner .spring-vine { box-shadow: 0 0 15px #fff, 0 0 25px #c5e1a5; }
+.theme-spring-card.spring-winner .flower { animation: bloom 0.6s ease-out forwards, flower-dance 2s ease-in-out infinite alternate; }
+@keyframes flower-dance { 0% { transform: rotate(-8deg) scale(1.1); } 100% { transform: rotate(8deg) scale(1.1); } }
+
+.spring-flowers .animate-pop { animation: bloom 0.6s ease-out 0.1s forwards; }
+.spring-flowers .animate-shrink { animation: wilt 0.4s ease-in forwards; }

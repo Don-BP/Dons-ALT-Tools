@@ -1,0 +1,212 @@
+/* --- Science Theme --- */
+body.theme-science { --body-bg-gradient: linear-gradient(to bottom, #e3f2fd 0%, #90caf9 100%); background-image: var(--body-bg-gradient); }
+.theme-science-card { background: linear-gradient(145deg, #eceff1 0%, #cfd8dc 100%); border: 3px solid #1976d2; box-shadow: 0 8px 25px rgba(25, 118, 210, 0.2), 0 0 10px rgba(227, 242, 253, 0.5) inset; }
+.theme-science-card .team-name-display .name-text { color: #0d47a1; }
+.theme-science-card .team-name-display { background-color: rgba(100, 181, 246, 0.6); }
+
+/* .score-display inherits height, center content */
+.theme-science-card .score-display {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Adjust visual size */
+.science-visual {
+    width: 220px; /* Increased size */
+    height: 220px; /* Increased size */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* Updated Nucleus Style */
+.science-nucleus {
+    width: 50px; /* Slightly larger nucleus */
+    height: 50px;
+    background-color: #1e88e5;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 15px rgba(30, 136, 229, 0.8),
+                0 0 25px rgba(100, 181, 246, 0.6),
+                inset 0 0 10px rgba(255, 255, 255, 0.3);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    z-index: 5;
+}
+
+.science-orbit-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+/* Updated Electron Style */
+.theme-item.electron {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 12px; height: 12px;
+    margin: -6px 0 0 -6px;
+    background-color: #ffeb3b;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #ffeb3b, 0 0 10px #fff;
+    opacity: 0;
+    transform-origin: 0px 0px;
+}
+
+/* --- Electron Animations (Appear & Orbit) --- */
+@keyframes electron-appear { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+
+.electron.animate-pop { animation: electron-appear 0.5s ease-out forwards; }
+
+/* Orbit definitions - Radii might need slight increase if visual is much larger */
+@keyframes electron-orbit-1 { from { transform: rotate(0deg) translateX(70px) rotate(0deg); } to { transform: rotate(360deg) translateX(70px) rotate(-360deg); } } /* Increased radius */
+@keyframes electron-orbit-2 { from { transform: rotate(0deg) translateX(95px) rotate(0deg); } to { transform: rotate(360deg) translateX(95px) rotate(-360deg); } } /* Increased radius */
+@keyframes electron-orbit-3 { from { transform: rotate(0deg) translateY(80px) translateX(20px) rotate(0deg); } 50% { transform: rotate(180deg) translateY(-80px) translateX(-20px) rotate(-180deg); } to { transform: rotate(360deg) translateY(80px) translateX(20px) rotate(-360deg); } } /* Increased radius */
+
+/* Apply orbits (nth-child selectors remain the same, link to new keyframes) */
+.electron:nth-child(1)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.0s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, 0.0s); }
+.electron:nth-child(2)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.0s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -0.4s); }
+/* ... (rest of nth-child selectors referencing orbit-1, orbit-2, orbit-3) ... */
+.electron:nth-child(3)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 3.5s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -0.8s); }
+.electron:nth-child(4)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.5s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -1.2s); }
+.electron:nth-child(5)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 6.0s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -1.6s); }
+.electron:nth-child(6)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.0s linear infinite reverse alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -2.0s); }
+.electron:nth-child(7)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 5.5s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -2.4s); }
+.electron:nth-child(8)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 3.8s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -2.8s); }
+.electron:nth-child(9)  { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.2s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -3.2s); }
+.electron:nth-child(10) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 3.8s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -3.6s); }
+.electron:nth-child(11) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.2s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -4.0s); }
+.electron:nth-child(12) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.8s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -4.4s); }
+.electron:nth-child(13) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.3s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -4.8s); }
+.electron:nth-child(14) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.8s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -5.2s); }
+.electron:nth-child(15) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 3.9s linear infinite reverse alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -5.6s); }
+.electron:nth-child(16) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 5.1s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -6.0s); }
+.electron:nth-child(17) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 4.1s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -6.4s); }
+.electron:nth-child(18) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 5.3s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -6.8s); }
+.electron:nth-child(19) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.7s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -7.2s); }
+.electron:nth-child(20) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.5s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -7.6s); }
+.electron:nth-child(21) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.4s linear infinite reverse alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -8.0s); }
+.electron:nth-child(22) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 5.9s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -8.4s); }
+.electron:nth-child(23) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 3.6s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -8.8s); }
+.electron:nth-child(24) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.6s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -9.2s); }
+.electron:nth-child(25) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.9s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -9.6s); }
+.electron:nth-child(26) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 4.2s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -10.0s); }
+.electron:nth-child(27) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 5.7s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -10.4s); }
+.electron:nth-child(28) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 3.7s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -10.8s); }
+.electron:nth-child(29) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 6.2s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -11.2s); }
+.electron:nth-child(30) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.1s linear infinite reverse alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -11.6s); }
+.electron:nth-child(31) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 5.3s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -12.0s); }
+.electron:nth-child(32) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 4.6s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -12.4s); }
+.electron:nth-child(33) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 5.1s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -12.8s); }
+.electron:nth-child(34) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.1s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -13.2s); }
+.electron:nth-child(35) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.6s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -13.6s); }
+.electron:nth-child(36) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.9s linear infinite reverse alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -14.0s); }
+.electron:nth-child(37) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 5.7s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -14.4s); }
+.electron:nth-child(38) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 4.4s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -14.8s); }
+.electron:nth-child(39) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 3.6s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -15.2s); }
+.electron:nth-child(40) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 5.0s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -15.6s); }
+.electron:nth-child(41) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 6.1s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -16.0s); }
+.electron:nth-child(42) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 4.7s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -16.4s); }
+.electron:nth-child(43) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.4s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -16.8s); }
+.electron:nth-child(44) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.4s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -17.2s); }
+.electron:nth-child(45) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 3.8s linear infinite reverse alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -17.6s); }
+.electron:nth-child(46) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 6.0s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -18.0s); }
+.electron:nth-child(47) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 4.0s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -18.4s); }
+.electron:nth-child(48) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-3 5.5s linear infinite alternate 0.5s; animation-delay: 0s, var(--orbit-delay, -18.8s); }
+.electron:nth-child(49) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-1 4.8s linear infinite reverse 0.5s; animation-delay: 0s, var(--orbit-delay, -19.2s); }
+.electron:nth-child(50) { animation: electron-appear 0.5s ease-out forwards, electron-orbit-2 5.9s linear infinite 0.5s; animation-delay: 0s, var(--orbit-delay, -19.6s); }
+
+
+/* State for initially rendered electrons */
+.electron:not(.animate-pop) { opacity: 1; }
+.electron:not(.animate-pop):nth-child(1)  { animation: electron-orbit-1 4.0s linear infinite; animation-delay: var(--orbit-delay, 0.0s); }
+.electron:not(.animate-pop):nth-child(2)  { animation: electron-orbit-2 5.0s linear infinite; animation-delay: var(--orbit-delay, -0.4s); }
+/* ... (rest of :not(.animate-pop) selectors referencing orbit-1, orbit-2, orbit-3) ... */
+.electron:not(.animate-pop):nth-child(3)  { animation: electron-orbit-3 3.5s linear infinite alternate; animation-delay: var(--orbit-delay, -0.8s); }
+.electron:not(.animate-pop):nth-child(4)  { animation: electron-orbit-1 4.5s linear infinite reverse; animation-delay: var(--orbit-delay, -1.2s); }
+.electron:not(.animate-pop):nth-child(5)  { animation: electron-orbit-2 6.0s linear infinite reverse; animation-delay: var(--orbit-delay, -1.6s); }
+.electron:not(.animate-pop):nth-child(6)  { animation: electron-orbit-3 4.0s linear infinite reverse alternate; animation-delay: var(--orbit-delay, -2.0s); }
+.electron:not(.animate-pop):nth-child(7)  { animation: electron-orbit-1 5.5s linear infinite; animation-delay: var(--orbit-delay, -2.4s); }
+.electron:not(.animate-pop):nth-child(8)  { animation: electron-orbit-2 3.8s linear infinite; animation-delay: var(--orbit-delay, -2.8s); }
+.electron:not(.animate-pop):nth-child(9)  { animation: electron-orbit-3 4.2s linear infinite; animation-delay: var(--orbit-delay, -3.2s); }
+.electron:not(.animate-pop):nth-child(10) { animation: electron-orbit-1 3.8s linear infinite reverse; animation-delay: var(--orbit-delay, -3.6s); }
+.electron:not(.animate-pop):nth-child(11) { animation: electron-orbit-2 5.2s linear infinite; animation-delay: var(--orbit-delay, -4.0s); }
+.electron:not(.animate-pop):nth-child(12) { animation: electron-orbit-3 4.8s linear infinite alternate; animation-delay: var(--orbit-delay, -4.4s); }
+.electron:not(.animate-pop):nth-child(13) { animation: electron-orbit-1 4.3s linear infinite; animation-delay: var(--orbit-delay, -4.8s); }
+.electron:not(.animate-pop):nth-child(14) { animation: electron-orbit-2 5.8s linear infinite reverse; animation-delay: var(--orbit-delay, -5.2s); }
+.electron:not(.animate-pop):nth-child(15) { animation: electron-orbit-3 3.9s linear infinite reverse alternate; animation-delay: var(--orbit-delay, -5.6s); }
+.electron:not(.animate-pop):nth-child(16) { animation: electron-orbit-1 5.1s linear infinite reverse; animation-delay: var(--orbit-delay, -6.0s); }
+.electron:not(.animate-pop):nth-child(17) { animation: electron-orbit-2 4.1s linear infinite; animation-delay: var(--orbit-delay, -6.4s); }
+.electron:not(.animate-pop):nth-child(18) { animation: electron-orbit-3 5.3s linear infinite alternate; animation-delay: var(--orbit-delay, -6.8s); }
+.electron:not(.animate-pop):nth-child(19) { animation: electron-orbit-1 4.7s linear infinite; animation-delay: var(--orbit-delay, -7.2s); }
+.electron:not(.animate-pop):nth-child(20) { animation: electron-orbit-2 5.5s linear infinite reverse; animation-delay: var(--orbit-delay, -7.6s); }
+.electron:not(.animate-pop):nth-child(21) { animation: electron-orbit-3 4.4s linear infinite reverse alternate; animation-delay: var(--orbit-delay, -8.0s); }
+.electron:not(.animate-pop):nth-child(22) { animation: electron-orbit-1 5.9s linear infinite; animation-delay: var(--orbit-delay, -8.4s); }
+.electron:not(.animate-pop):nth-child(23) { animation: electron-orbit-2 3.6s linear infinite; animation-delay: var(--orbit-delay, -8.8s); }
+.electron:not(.animate-pop):nth-child(24) { animation: electron-orbit-3 4.6s linear infinite; animation-delay: var(--orbit-delay, -9.2s); }
+.electron:not(.animate-pop):nth-child(25) { animation: electron-orbit-1 4.9s linear infinite reverse; animation-delay: var(--orbit-delay, -9.6s); }
+.electron:not(.animate-pop):nth-child(26) { animation: electron-orbit-2 4.2s linear infinite; animation-delay: var(--orbit-delay, -10.0s); }
+.electron:not(.animate-pop):nth-child(27) { animation: electron-orbit-3 5.7s linear infinite alternate; animation-delay: var(--orbit-delay, -10.4s); }
+.electron:not(.animate-pop):nth-child(28) { animation: electron-orbit-1 3.7s linear infinite; animation-delay: var(--orbit-delay, -10.8s); }
+.electron:not(.animate-pop):nth-child(29) { animation: electron-orbit-2 6.2s linear infinite reverse; animation-delay: var(--orbit-delay, -11.2s); }
+.electron:not(.animate-pop):nth-child(30) { animation: electron-orbit-3 4.1s linear infinite reverse alternate; animation-delay: var(--orbit-delay, -11.6s); }
+.electron:not(.animate-pop):nth-child(31) { animation: electron-orbit-1 5.3s linear infinite reverse; animation-delay: var(--orbit-delay, -12.0s); }
+.electron:not(.animate-pop):nth-child(32) { animation: electron-orbit-2 4.6s linear infinite; animation-delay: var(--orbit-delay, -12.4s); }
+.electron:not(.animate-pop):nth-child(33) { animation: electron-orbit-3 5.1s linear infinite alternate; animation-delay: var(--orbit-delay, -12.8s); }
+.electron:not(.animate-pop):nth-child(34) { animation: electron-orbit-1 4.1s linear infinite; animation-delay: var(--orbit-delay, -13.2s); }
+.electron:not(.animate-pop):nth-child(35) { animation: electron-orbit-2 5.6s linear infinite reverse; animation-delay: var(--orbit-delay, -13.6s); }
+.electron:not(.animate-pop):nth-child(36) { animation: electron-orbit-3 4.9s linear infinite reverse alternate; animation-delay: var(--orbit-delay, -14.0s); }
+.electron:not(.animate-pop):nth-child(37) { animation: electron-orbit-1 5.7s linear infinite; animation-delay: var(--orbit-delay, -14.4s); }
+.electron:not(.animate-pop):nth-child(38) { animation: electron-orbit-2 4.4s linear infinite; animation-delay: var(--orbit-delay, -14.8s); }
+.electron:not(.animate-pop):nth-child(39) { animation: electron-orbit-3 3.6s linear infinite; animation-delay: var(--orbit-delay, -15.2s); }
+.electron:not(.animate-pop):nth-child(40) { animation: electron-orbit-1 5.0s linear infinite reverse; animation-delay: var(--orbit-delay, -15.6s); }
+.electron:not(.animate-pop):nth-child(41) { animation: electron-orbit-2 6.1s linear infinite; animation-delay: var(--orbit-delay, -16.0s); }
+.electron:not(.animate-pop):nth-child(42) { animation: electron-orbit-3 4.7s linear infinite alternate; animation-delay: var(--orbit-delay, -16.4s); }
+.electron:not(.animate-pop):nth-child(43) { animation: electron-orbit-1 4.4s linear infinite reverse; animation-delay: var(--orbit-delay, -16.8s); }
+.electron:not(.animate-pop):nth-child(44) { animation: electron-orbit-2 5.4s linear infinite reverse; animation-delay: var(--orbit-delay, -17.2s); }
+.electron:not(.animate-pop):nth-child(45) { animation: electron-orbit-3 3.8s linear infinite reverse alternate; animation-delay: var(--orbit-delay, -17.6s); }
+.electron:not(.animate-pop):nth-child(46) { animation: electron-orbit-1 6.0s linear infinite; animation-delay: var(--orbit-delay, -18.0s); }
+.electron:not(.animate-pop):nth-child(47) { animation: electron-orbit-2 4.0s linear infinite; animation-delay: var(--orbit-delay, -18.4s); }
+.electron:not(.animate-pop):nth-child(48) { animation: electron-orbit-3 5.5s linear infinite alternate; animation-delay: var(--orbit-delay, -18.8s); }
+.electron:not(.animate-pop):nth-child(49) { animation: electron-orbit-1 4.8s linear infinite reverse; animation-delay: var(--orbit-delay, -19.2s); }
+.electron:not(.animate-pop):nth-child(50) { animation: electron-orbit-2 5.9s linear infinite; animation-delay: var(--orbit-delay, -19.6s); }
+
+
+/* Shrink Animation */
+.theme-item.animate-shrink {
+    animation: electron-disappear 0.4s ease-in forwards !important;
+}
+@keyframes electron-disappear {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0); }
+}
+
+/* Theme-specific score number color */
+.theme-science-card .score-number { color: #1565c0; }
+
+/* Badge hidden by JS logic */
+.item-count-badge { display: none !important; }
+
+/* --- WINNER ANIMATION --- */
+.theme-science-card.science-winner .science-nucleus {
+    animation: pulse-glow 1s infinite alternate;
+    background-color: #90caf9;
+}
+
+.theme-science-card.science-winner .electron {
+    animation-duration: 0.5s, 1.5s !important;
+    box-shadow: 0 0 10px #fff, 0 0 15px #ffeb3b;
+    animation-play-state: running !important;
+    opacity: 1;
+}
+
+.theme-science-card.science-winner .electron.dancing {
+     filter: brightness(1.2);
+}
+
+@keyframes pulse-glow {
+    0% { transform: scale(1); box-shadow: 0 0 15px #1e88e5, 0 0 25px #64b5f6, inset 0 0 10px rgba(255,255,255,0.3); }
+    50% { transform: scale(1.1); box-shadow: 0 0 25px #90caf9, 0 0 40px #e3f2fd, inset 0 0 15px rgba(255,255,255,0.5); }
+    100% { transform: scale(1); box-shadow: 0 0 15px #1e88e5, 0 0 25px #64b5f6, inset 0 0 10px rgba(255,255,255,0.3); }
+}

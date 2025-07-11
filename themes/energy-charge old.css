@@ -1,0 +1,100 @@
+/* --- Energy Charge Theme --- */
+body.theme-energy-charge { --body-bg-gradient: linear-gradient(135deg, #4527a0 0%, #7e57c2 50%, #ffb74d 100%); background-image: var(--body-bg-gradient); background-size: 200% 200%; animation: background-pan 15s ease infinite; }
+@keyframes background-pan { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.theme-energy-charge-card { background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, rgba(0,0,0, 0.1) 70%), #4a148c; border: 3px solid transparent; box-shadow: 0 8px 30px rgba(255, 193, 7, 0.15); position: relative; overflow: hidden; --charge-level: 0; --icon-scale: 1; transition: box-shadow 0.5s ease; }
+.theme-energy-charge-card::before { content: ''; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; border-radius: 25px; padding: 3px; background: linear-gradient(120deg, #ffeb3b, #ffa000, #ffeb3b) border-box; background-size: 300% 100%; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; z-index: 5; opacity: calc(var(--charge-level) * 0.33); animation: border-flow 3s linear infinite paused; transition: opacity 0.5s ease; }
+.theme-energy-charge-card.charge-active::before { animation-play-state: running; }
+@keyframes border-flow { from { background-position: 0% 0; } to { background-position: 300% 0; } }
+.theme-energy-charge-card .team-name-display .name-text { color: #fff; }
+.theme-energy-charge-card .team-name-display { background-color: rgba(255, 179, 0, 0.7); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+/* Let score-display inherit height from style.css, but keep centering */
+.theme-energy-charge-card .score-display {
+    /* REMOVED min-height */
+    position: relative;
+    display: flex; /* Keep flex */
+    flex-direction: column; /* Keep column */
+    justify-content: center; /* Keep centering */
+    align-items: center; /* Keep centering */
+    width: 100%;
+    z-index: 1;
+    padding: 10px 0; /* Reduced vertical padding slightly */
+    /* Ensure it can grow */
+    flex-grow: 1;
+}
+
+/* Style the wrapper containing icon and effects layer */
+.energy-charge-visual-wrapper { /* This has theme-visual-container class */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Make the wrapper fill the score-display area */
+    width: 100%;
+    position: relative; /* Position context for children */
+    /* min-height: 280px; */ /* Optional: Minimum size for the wrapper itself */
+}
+
+
+/* Layer for background effects (covers the visual wrapper now indirectly via score-display) */
+.card-effect-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 22px; overflow: hidden; z-index: 0; pointer-events: none; background: linear-gradient(110deg, rgba(255, 193, 7, 0.3), rgba(171, 71, 188, 0.2), rgba(255, 235, 59, 0.3), rgba(126, 87, 194, 0.2)); background-size: 300% 300%; animation: swirl-background 12s ease infinite alternate paused; opacity: 0; transition: opacity 0.8s ease; }
+.theme-energy-charge-card.charge-active .card-effect-layer { animation-play-state: running; opacity: calc(var(--charge-level) * 0.1 + 0.05); }
+.theme-energy-charge-card.charge-high .card-effect-layer { opacity: calc(var(--charge-level) * 0.15 + 0.1); animation-duration: 8s; }
+@keyframes swirl-background { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+/* Base Glow Pulse */
+.card-effect-layer::before { content: ''; position: absolute; top: 50%; left: 50%; width: 150%; height: 150%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(255, 193, 7, 0.5) 0%, transparent 60%); border-radius: 50%; opacity: calc(var(--charge-level) * 0.2); transition: opacity 0.5s ease, transform 0.8s ease; animation: slow-pulse 5s infinite ease-in-out; animation-play-state: paused; }
+.theme-energy-charge-card.charge-active .card-effect-layer::before { animation-play-state: running; }
+.theme-energy-charge-card.charge-high .card-effect-layer::before { animation-duration: 3s; opacity: calc(var(--charge-level) * 0.3); }
+@keyframes slow-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: calc(var(--charge-level) * 0.15); } 50% { transform: translate(-50%, -50%) scale(1); opacity: calc(var(--charge-level) * 0.25); } }
+
+/* Central Brain Icon (lives inside wrapper) */
+.energy-charge-icon {
+    width: 110px;
+    height: 110px;
+    margin-bottom: 15px;
+    position: relative; /* Keep relative to wrapper */
+    z-index: 2; /* Above effects layer */
+    filter: grayscale(80%) opacity(0.7) drop-shadow(0 0 0 transparent);
+    transform: scale(var(--icon-scale));
+    transition: filter 0.5s ease, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.theme-energy-charge-card.charge-active .energy-charge-icon { filter: grayscale(0%) opacity(1) drop-shadow(0 0 8px rgba(255, 193, 7, 0.6)); }
+.theme-energy-charge-card.charge-medium .energy-charge-icon { filter: grayscale(0%) opacity(1) drop-shadow(0 0 12px rgba(255, 193, 7, 0.8)); }
+.theme-energy-charge-card.charge-high .energy-charge-icon { filter: grayscale(0%) opacity(1) drop-shadow(0 0 18px #ffa000); animation: icon-float 4s infinite ease-in-out; }
+@keyframes icon-float { 0%, 100% { transform: scale(var(--icon-scale)) translateY(0); } 50% { transform: scale(var(--icon-scale)) translateY(-8px); } }
+
+/* Theme-specific score number color/shadow */
+.theme-energy-charge-card .score-number {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 193, 7, calc(var(--charge-level) * 0.2));
+    /* Position handled by style.css */
+}
+
+/* Team Controls */
+.theme-energy-charge-card .team-controls { width: 100%; margin-top: auto; position: relative; z-index: 20; padding-bottom: 5px; }
+.theme-energy-charge-card .point-btn { pointer-events: auto; }
+/* Burst/Shockwave effect for score add */
+.card-effect-layer.animate-burst::after { content: ''; position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); background: #fff; border-radius: 50%; opacity: 0.9; animation: energy-burst-enhanced 0.6s cubic-bezier(0.1, 0.7, 0.3, 1) forwards; box-shadow: 0 0 15px #fff, 0 0 30px #ffeb3b, 0 0 50px #ffa000, 0 0 70px #ff9800; z-index: 1; pointer-events: none; }
+@keyframes energy-burst-enhanced { from { width: 10px; height: 10px; opacity: 0.9; filter: brightness(1.5); } to { width: 500px; height: 500px; opacity: 0; filter: brightness(1); } }
+/* Icon pulse on add */
+.energy-charge-icon.animate-pulse-strong { animation: pulse-strong-once 0.5s ease-out; }
+@keyframes pulse-strong-once { 0% { transform: scale(var(--icon-scale)); } 50% { transform: scale(calc(var(--icon-scale) * 1.2)); } 100% { transform: scale(var(--icon-scale)); } }
+/* Dim effect on subtract */
+.card-effect-layer.animate-dim { animation: dim-effect 0.3s ease-out forwards; }
+@keyframes dim-effect { from { opacity: calc(var(--charge-level) * 0.1 + 0.05); } to { opacity: calc(var(--charge-level) * 0.05 + 0.02); } }
+/* Winner Animation */
+.theme-energy-charge-card.energy-charge-winner { animation: card-win-throb 1.5s infinite ease-in-out; }
+.theme-energy-charge-card.energy-charge-winner .energy-charge-icon { animation: icon-win-float 2s infinite ease-in-out, icon-win-spin 8s infinite linear; filter: grayscale(0%) opacity(1) drop-shadow(0 0 25px #ffeb3b); }
+.theme-energy-charge-card.energy-charge-winner .card-effect-layer { animation-duration: 6s; opacity: 0.5; animation-play-state: running !important; }
+.theme-energy-charge-card.energy-charge-winner .card-effect-layer::before { animation: pulse-win 2s infinite ease-in-out; opacity: 0.8; }
+/* Swirling particle effect for winner */
+.theme-energy-charge-card.energy-charge-winner .card-effect-layer::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at center, rgba(255,235,59,0.7) 1px, transparent 2px), radial-gradient(circle at center, rgba(255,255,255,0.6) 1px, transparent 2px); background-size: 20px 20px, 30px 30px; background-position: 0 0, 10px 10px; animation: particles-swirl 5s infinite linear, particles-fade-in 1s ease forwards; opacity: 0; z-index: 2; pointer-events:none; }
+@keyframes particles-fade-in { from { opacity: 0; } to { opacity: 0.8; } }
+@keyframes particles-swirl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes card-win-throb { 0%, 100% { transform: scale(1.03); box-shadow: 0 0 30px gold, 0 0 15px #fff; } 50% { transform: scale(1.05); box-shadow: 0 0 40px gold, 0 0 20px #fff; } }
+@keyframes icon-win-float { 0%, 100% { transform: scale(1.1) translateY(0); } 50% { transform: scale(1.2) translateY(-8px); } }
+@keyframes icon-win-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulse-win { 0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; } 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; } }
+
+/* Badge hidden by JS logic */
+.item-count-badge { display: none !important; }

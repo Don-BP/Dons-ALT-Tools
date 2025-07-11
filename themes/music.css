@@ -1,0 +1,79 @@
+/* --- Music Theme --- */
+body.theme-music { --body-bg-gradient: linear-gradient(to bottom, #f3e5f5 0%, #e1bee7 100%); background-image: var(--body-bg-gradient); }
+.theme-music-card { background: linear-gradient(145deg, #ffffff 90%, #f3e5f5 100%); border: 3px solid #8e24aa; box-shadow: 0 8px 25px rgba(142, 36, 170, 0.2), 0 0 10px rgba(243, 229, 245, 0.5) inset; }
+.theme-music-card .team-name-display .name-text { color: #6a1b9a; }
+
+.theme-music-card .score-display {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.music-visual {
+    width: 95%;
+    height: 300px;
+    position: relative;
+    margin-bottom: 15px;
+    border-left: 3px solid #aaa;
+    border-right: 3px solid #aaa;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 10px 0;
+}
+.music-staff-line { width: 100%; height: 2px; background-color: #aaa; transition: background-color 0.5s ease, box-shadow 0.5s ease; }
+.music-notes-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.theme-item.note {
+    font-size: 3.2em;
+    color: #ab47bc;
+    opacity: 0;
+    position: absolute;
+    transform: translateY(10px) scale(0);
+    transform-origin: bottom center;
+    transition: color 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+}
+
+.theme-item.note.animate-pop {
+    animation: appear-note 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    animation-delay: var(--item-delay, 0s);
+}
+@keyframes appear-note {
+    0% { opacity: 0; transform: translateY(20px) scale(0.5); }
+    60% { opacity: 1; transform: translateY(-5px) scale(1.1); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.theme-item.note.animate-shrink {
+    animation: disappear-note 0.4s ease-in forwards;
+}
+@keyframes disappear-note {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.3) rotate(20deg); }
+}
+
+.theme-music-card .score-number { color: #4a148c; }
+
+/* --- WINNER ANIMATION --- */
+.theme-music-card.music-winner .music-staff-line {
+    background-color: #ce93d8;
+    animation: staff-glow 1.5s infinite alternate;
+}
+@keyframes staff-glow {
+    from { box-shadow: 0 0 5px #e1bee7; }
+    to { box-shadow: 0 0 15px #fff, 0 0 8px #ce93d8; }
+}
+
+.theme-music-card.music-winner .note.dancing {
+    color: #ba68c8;
+    filter: drop-shadow(0 0 8px #fff);
+    opacity: 1;
+    animation: music-dance 1.2s ease-in-out infinite alternate;
+    animation-delay: calc(var(--item-index, 0) * 0.08s);
+}
+@keyframes music-dance {
+    0% { transform: translateY(-8px) rotate(-10deg) scale(1.1); }
+    100% { transform: translateY(8px) rotate(10deg) scale(1.1); }
+}
