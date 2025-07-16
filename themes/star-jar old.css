@@ -1,0 +1,54 @@
+/* --- Star Jar Theme --- */
+body.theme-star-jar { --body-bg-gradient: linear-gradient(170deg, #2c3e50 0%, #4ca1af 100%); background-image: var(--body-bg-gradient); }
+.theme-star-jar-card { background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(230, 245, 255, 0.8) 100%); border: 3px solid #ffd700; box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.5) inset; }
+.theme-star-jar-card .team-name-display .name-text { color: #1a2933; }
+.theme-star-jar-card .team-name-display { background-color: rgba(255, 215, 0, 0.6); }
+
+.star-jar-visual {
+    width: 90%;
+    height: 300px;
+    background: radial-gradient(ellipse at bottom, rgba(173, 216, 230, 0.3) 0%, rgba(135, 206, 250, 0.5) 60%);
+    border: 5px solid #add8e6;
+    border-bottom-left-radius: 60px 30px;
+    border-bottom-right-radius: 60px 30px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-end;
+    justify-content: center;
+    padding: 10px 10px 20px 10px;
+    gap: 5px;
+    overflow: hidden;
+    box-shadow: inset 0 -10px 15px rgba(0, 0, 0, 0.1), inset 0 5px 10px rgba(255, 255, 255, 0.3);
+    z-index: 5;
+    margin-bottom: 10px;
+}
+.star-jar-visual::before { content: ''; position: absolute; top: 5px; left: 10%; width: 50%; height: 30px; background: linear-gradient(to bottom, rgba(255,255,255,0.6), transparent); border-radius: 50%; transform: rotate(-15deg); opacity: 0.7; }
+.theme-star-jar-card .score-display::before,
+.theme-star-jar-card .score-display::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 15px; z-index: 0; pointer-events: none; opacity: 0.6; }
+.theme-star-jar-card .score-display::before { width: 2px; height: 2px; background: transparent; box-shadow: 30px 80px 0 0px rgba(255, 255, 255, 0.7), 150px 40px 0 0px rgba(255, 235, 59, 0.6), 220px 120px 0 0px rgba(255, 255, 255, 0.5), 80px 150px 0 0px rgba(255, 235, 59, 0.5), 250px 180px 0 0px rgba(255, 255, 255, 0.6), 50px 20px 0 0px rgba(255, 255, 255, 0.4), 180px 90px 0 0px rgba(255, 235, 59, 0.7); animation: float-particles 25s infinite linear; }
+.theme-star-jar-card .score-display::after { width: 3px; height: 3px; background: transparent; box-shadow: 60px 30px 0 0px rgba(255, 255, 255, 0.8), 190px 140px 0 0px rgba(255, 235, 59, 0.7), 20px 110px 0 0px rgba(255, 255, 255, 0.6), 240px 60px 0 0px rgba(255, 235, 59, 0.6), 100px 170px 0 0px rgba(255, 255, 255, 0.7); animation: float-particles-alt 35s infinite linear; }
+@keyframes float-particles { 0% { transform: translateY(0px) translateX(0px); opacity: 0.6; } 50% { transform: translateY(-15px) translateX(5px); opacity: 0.8; } 100% { transform: translateY(0px) translateX(0px); opacity: 0.6; } }
+@keyframes float-particles-alt { 0% { transform: translateY(0px) translateX(0px); opacity: 0.5; } 50% { transform: translateY(10px) translateX(-8px); opacity: 0.7; } 100% { transform: translateY(0px) translateX(0px); opacity: 0.5; } }
+.star-token { font-size: 2.0em; display: inline-block; line-height: 1; color: #FFEB3B; text-shadow: 0 0 5px #FFC107; transform-origin: center bottom; transition: transform 0.3s ease, opacity 0.3s ease, font-size 0.3s ease; animation: star-shimmer 4s infinite ease-in-out; animation-delay: calc(var(--item-index, 0) * 0.1s + 0.5s); }
+.star-token.initial-state { animation: none !important; }
+.star-token.animate-pop { animation: gift-pop 0.4s ease-out forwards, star-shimmer 4s infinite ease-in-out 0.4s; animation-delay: 0s, calc(var(--item-index, 0) * 0.1s + 0.4s); }
+.star-token.animate-land { animation: land-bounce 0.6s ease-out forwards, star-shimmer 4s infinite ease-in-out 0.6s; animation-delay: 0s, calc(var(--star-index, 0) * 0.1s + 0.6s); }
+.star-token.animate-shrink { animation: shrink-fade-out 0.3s ease-out forwards !important; }
+@keyframes star-shimmer { 0%, 100% { filter: brightness(1); text-shadow: 0 0 5px #FFC107; } 50% { filter: brightness(1.4); text-shadow: 0 0 12px #FFFDE7; } }
+.flying-star { position: absolute; font-size: 2.5em; color: #ffeb3b; text-shadow: 0 0 8px #ffc107, 0 0 15px #ffffff; z-index: 50; pointer-events: none; right: 15%; bottom: 10%; opacity: 0; transform: scale(0.5); }
+.flying-star.animate { animation: fly-arc-to-jar 0.8s cubic-bezier(0.3, 0, 0.7, 1) forwards; }
+.item-count-badge { position: absolute; bottom: 10px; right: 10px; background-color: rgba(0, 0, 0, 0.7); color: #fff; font-size: 0.9em; font-weight: bold; padding: 3px 8px; border-radius: 10px; z-index: 15; box-shadow: 0 0 5px rgba(255,255,255,0.5); display: none; transition: transform 0.3s ease; }
+.item-count-badge.animate-pulse { animation: pulse-badge 0.5s ease-out; }
+.theme-star-jar-card.star-jar-winner .star-jar-visual { animation: jar-win-pulse 1s infinite ease-in-out; }
+.theme-star-jar-card.star-jar-winner .star-token.dancing { position: relative; transform-origin: center center; animation: star-win-dance 1.5s infinite ease-in-out; animation-delay: calc(var(--item-index, 0) * 0.05s); }
+@keyframes jar-win-pulse { 0%, 100% { box-shadow: inset 0 -10px 15px rgba(0, 0, 0, 0.1), inset 0 5px 10px rgba(255, 255, 255, 0.3), 0 0 15px gold; } 50% { box-shadow: inset 0 -10px 15px rgba(0, 0, 0, 0.1), inset 0 5px 10px rgba(255, 255, 255, 0.3), 0 0 25px #fff; } }
+@keyframes star-win-dance { 0%   { transform: scale(1) rotate(0deg) translateY(0px); filter: brightness(1.2); text-shadow: 0 0 8px #FFC107; } 25%  { transform: scale(1.3) rotate(15deg) translateY(-5px); filter: brightness(1.6); text-shadow: 0 0 18px #fff; } 50%  { transform: scale(0.9) rotate(-10deg) translateY(3px); filter: brightness(1); text-shadow: 0 0 5px #FFC107; } 75%  { transform: scale(1.2) rotate(5deg) translateY(-3px); filter: brightness(1.4); text-shadow: 0 0 12px #FFFDE7; } 100% { transform: scale(1) rotate(0deg) translateY(0px); filter: brightness(1.2); text-shadow: 0 0 8px #FFC107; } }
+@keyframes drop-in { from { transform: translateY(-50px) scale(0.5); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes land-bounce { 0% { transform: scale(1); } 30% { transform: scale(1.3) rotate(10deg); } 50% { transform: scale(0.9) rotate(-5deg); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes shrink-fade-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.3) rotate(15deg); } }
+@keyframes fly-arc-to-jar { 0% { opacity: 1; transform: translate(0, 0) scale(0.5) rotate(0deg); } 50% { transform: translate(-60px, -160px) scale(1.2) rotate(-30deg); opacity: 1; } 100% { transform: translate(-70px, -10px) scale(0.8) rotate(10deg); opacity: 0; } }
+@keyframes pulse-badge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+@keyframes gift-pop { 0% { transform: scale(0.5) rotate(-15deg); opacity: 0; } 70% { transform: scale(1.1) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }

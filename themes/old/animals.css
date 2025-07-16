@@ -1,0 +1,65 @@
+/* --- Animals Theme --- */
+body.theme-animals { --body-bg-gradient: linear-gradient(to bottom, #dcedc8 0%, #a5d6a7 100%); background-image: var(--body-bg-gradient); }
+.theme-animals-card { background: linear-gradient(145deg, #fffde7 60%, #fff9c4 100%); border: 3px solid #795548; box-shadow: 0 8px 25px rgba(121, 85, 72, 0.2), 0 0 10px rgba(240, 229, 217, 0.5) inset; }
+.theme-animals-card .team-name-display .name-text { color: #4e342e; }
+.theme-animals-card .team-name-display { background-color: rgba(161, 136, 127, 0.6); }
+
+/* .score-display inherits min-height from style.css */
+
+.animals-visual {
+    width: 95%;
+    height: 300px; /* Adjusted height */
+    position: relative;
+    margin-bottom: 10px;
+    background-color: #efebe9;
+    border-radius: 10px;
+    border: 3px solid #bcaaa4;
+    overflow: hidden;
+}
+
+.theme-item { /* Paw print */ font-size: 1.8em; color: #8d6e63; position: absolute; opacity: 0; transform: scale(0); }
+.theme-item.animate-pop { animation: appear-paw 0.5s ease-out 0.1s forwards; }
+.theme-item.animate-shrink { animation: disappear-paw 0.4s ease-in forwards; }
+@keyframes appear-paw { from { opacity: 0; transform: scale(0.5) rotate(var(--initial-rotate, 0deg)); } to { opacity: 0.8; transform: scale(1) rotate(var(--initial-rotate, 0deg)); } }
+@keyframes disappear-paw { from { opacity: 0.8; transform: scale(1) rotate(var(--initial-rotate, 0deg)); } to { opacity: 0; transform: scale(0.3) rotate(var(--initial-rotate, 0deg)); } }
+
+/* Adjusted positions for taller area */
+.animals-visual .theme-item:nth-child(1) { top: 85%; left: 10%; --initial-rotate: -20deg; }
+.animals-visual .theme-item:nth-child(2) { top: 80%; left: 30%; --initial-rotate: 10deg; }
+.animals-visual .theme-item:nth-child(3) { top: 70%; left: 50%; --initial-rotate: -15deg; }
+.animals-visual .theme-item:nth-child(4) { top: 65%; left: 70%; --initial-rotate: 5deg; }
+.animals-visual .theme-item:nth-child(5) { top: 55%; left: 60%; --initial-rotate: -25deg; }
+.animals-visual .theme-item:nth-child(6) { top: 45%; left: 40%; --initial-rotate: 15deg; }
+.animals-visual .theme-item:nth-child(7) { top: 35%; left: 20%; --initial-rotate: -10deg; }
+.animals-visual .theme-item:nth-child(8) { top: 25%; left: 40%; --initial-rotate: 20deg; }
+.animals-visual .theme-item:nth-child(9) { top: 15%; left: 65%; --initial-rotate: -5deg; }
+.animals-visual .theme-item:nth-child(10) { top: 10%; left: 80%; --initial-rotate: 10deg; }
+.animals-visual .theme-item:nth-child(11) { top: 20%; left: 70%; --initial-rotate: -15deg; }
+.animals-visual .theme-item:nth-child(12) { top: 30%; left: 85%; --initial-rotate: 0deg; }
+.animals-visual .theme-item:nth-child(13) { top: 40%; left: 15%; --initial-rotate: 25deg; }
+.animals-visual .theme-item:nth-child(14) { top: 50%; left: 35%; --initial-rotate: -10deg; }
+.animals-visual .theme-item:nth-child(15) { top: 60%; left: 55%; --initial-rotate: 20deg; }
+.animals-visual .theme-item:nth-child(16) { top: 75%; left: 75%; --initial-rotate: -5deg; }
+.animals-visual .theme-item:nth-child(17) { top: 80%; left: 50%; --initial-rotate: 15deg; }
+.animals-visual .theme-item:nth-child(18) { top: 70%; left: 25%; --initial-rotate: -20deg; }
+.animals-visual .theme-item:nth-child(19) { top: 50%; left: 75%; --initial-rotate: 10deg; }
+.animals-visual .theme-item:nth-child(20) { top: 25%; left: 55%; --initial-rotate: -15deg; }
+
+/* Theme-specific score number color (position handled in style.css) */
+.theme-animals-card .score-number { color: #5d4037; }
+
+.item-count-badge { position: absolute; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.6); color: #fff; padding: 3px 8px; border-radius: 10px; font-size: 0.9em; display: none; z-index: 15; }
+
+.theme-animals-card.animals-winner .animals-visual { border-color: gold; }
+.theme-animals-card.animals-winner .theme-item {
+    animation: appear-paw 0.5s ease-out forwards, wiggle-paw 0.5s linear infinite alternate;
+    color: #a1887f; opacity: 1;
+    animation-delay: 0s, calc(var(--item-index, 0) * 0.05s);
+    transform: rotate(var(--initial-rotate, 0deg)) scale(1);
+}
+@keyframes wiggle-paw {
+    from { transform: rotate(calc(var(--initial-rotate, 0deg) - 8deg)) scale(1.1); }
+    to { transform: rotate(calc(var(--initial-rotate, 0deg) + 8deg)) scale(1.1); }
+}
+.animals-visual .animate-pop { /* Empty, handled by JS adding class */ }
+.animals-visual .animate-shrink { animation: disappear-paw 0.4s ease-in forwards; }

@@ -1,0 +1,54 @@
+/* --- Halloween Theme --- */
+body.theme-halloween { --body-bg-gradient: linear-gradient(to bottom, #212121 0%, #424242 100%); background-image: var(--body-bg-gradient); }
+.theme-halloween-card { background: linear-gradient(145deg, #424242 0%, #303030 100%); border: 3px solid #ff9800; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 152, 0, 0.5) inset, inset 0 0 30px rgba(0,0,0,0.5); }
+.theme-halloween-card .team-name-display .name-text { color: #ffeb3b; }
+.theme-halloween-card .team-name-display { background-color: rgba(0, 0, 0, 0.5); }
+
+.halloween-visual {
+    display: block;
+    width: 95%;
+    height: 300px;
+    position: relative;
+    margin-bottom: 10px;
+    border: 2px dashed rgba(255, 152, 0, 0.3);
+    border-radius: 10px;
+    background: radial-gradient(ellipse at center, rgba(66,66,66,0.5) 0%, rgba(33,33,33,0.8) 100%);
+    overflow: hidden;
+}
+.theme-item.ghost {
+    font-size: 2.4em; position: absolute; opacity: 0; color: #eee;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+    top: calc(5% + var(--random-y, 0.5) * 90%);
+    left: calc(5% + var(--random-x, 0.5) * 90%);
+    animation: ghost-appear 0.5s ease-out forwards, ghost-float 8s ease-in-out infinite alternate;
+    animation-delay: 0.1s, calc(var(--random-delay, 0) * 3s + 0.5s);
+}
+
+.theme-item.animate-pop { animation: ghost-appear 0.5s ease-out forwards, ghost-float 8s ease-in-out infinite alternate; animation-delay: 0.1s, calc(var(--random-delay, 0) * 3s + 0.5s); }
+.theme-item.animate-shrink { animation: ghost-disappear 0.4s ease-in forwards !important; }
+@keyframes ghost-appear { from { opacity: 0; transform: scale(0.5) translateY(10px); } to { opacity: 0.8; transform: scale(1) translateY(0); } }
+@keyframes ghost-disappear { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(0.3) rotate(30deg); } }
+@keyframes ghost-float { 0% { transform: translateY(0px) translateX(0px) rotate(-4deg); } 25% { transform: translateY(-12px) translateX(8px) rotate(5deg); } 50% { transform: translateY(8px) translateX(-6px) rotate(2deg); } 75% { transform: translateY(-6px) translateX(-8px) rotate(-5deg); } 100% { transform: translateY(0px) translateX(0px) rotate(-4deg); } }
+
+.theme-halloween-card .score-number { color: #ff9800; text-shadow: 0 0 5px #ffeb3b; }
+
+/* --- WINNER ANIMATION --- */
+.theme-halloween-card.halloween-winner .halloween-visual {
+    border-color: gold;
+    animation: spooky-pulse 2s infinite ease-in-out;
+}
+@keyframes spooky-pulse {
+    0% { box-shadow: 0 0 10px rgba(255, 152, 0, 0.5); }
+    50% { box-shadow: 0 0 25px rgba(255, 152, 0, 0.8), 0 0 15px rgba(255, 235, 59, 0.5); }
+    100% { box-shadow: 0 0 10px rgba(255, 152, 0, 0.5); }
+}
+.theme-halloween-card.halloween-winner .theme-item.ghost {
+    animation: ghost-win-dance 2.5s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 15px #fff); opacity: 1;
+    animation-delay: calc(var(--item-index, 0) * 0.1s);
+}
+@keyframes ghost-win-dance {
+    0% { transform: translateY(-10px) rotate(-15deg) scale(1.2); }
+    50% { transform: translateY(10px) rotate(15deg) scale(1.1); }
+    100% { transform: translateY(-10px) rotate(-15deg) scale(1.2); }
+}

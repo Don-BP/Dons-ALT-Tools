@@ -1,0 +1,57 @@
+/* --- Minimalist Theme --- */
+body.theme-minimalist { --body-bg-gradient: linear-gradient(to bottom, #e8eaf6, #c5cae9); background-image: var(--body-bg-gradient); }
+.theme-minimalist-card { background-color: #f8f9fa; border: 3px solid #9fa8da; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); border-radius: 15px; }
+.theme-minimalist-card .team-name-display .name-text { color: #3f51b5; font-family: sans-serif; font-weight: 600; font-size: 1.4em; }
+.theme-minimalist-card .team-name-display { background-color: transparent; }
+.theme-minimalist-card .team-name-display:hover { background-color: rgba(0,0,0,0.03); }
+
+/* .score-display inherits height, adjust content alignment */
+.theme-minimalist-card .score-display {
+    width: 100%; /* Take full width */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center dots vertically */
+    position: relative;
+}
+
+.minimalist-dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* Slightly larger gap */
+    margin-bottom: 20px;
+    max-width: 90%; /* Limit width */
+    padding: 15px;
+    min-height: 280px; /* Adjusted height */
+    width: 100%;
+    position:relative;
+    overflow-y: auto; /* Scroll if needed */
+}
+.dot {
+    width: 20px; /* Bigger dots */
+    height: 20px; /* Bigger dots */
+    background-color: #5c6bc0;
+    border-radius: 50%;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.dot.animate-pop { animation: dot-pop 0.4s ease-out forwards; }
+.dot.animate-shrink { animation: dot-shrink 0.3s ease-out forwards; }
+@keyframes dot-pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes dot-shrink { from { transform: scale(1); opacity: 1; } to { transform: scale(0.3); opacity: 0; } }
+
+/* Theme-specific score number color */
+.theme-minimalist-card .score-number { color: #303f9f; font-weight: 600; /* Keep font weight */ }
+
+/* Team controls positioning ok */
+
+.theme-minimalist-card.minimalist-winner { border-color: #3f51b5; box-shadow: 0 6px 20px rgba(63, 81, 181, 0.3); }
+.theme-minimalist-card.minimalist-winner .dot { animation: dot-win-pulse 1.5s infinite ease-in-out; animation-delay: calc(var(--item-index, 0) * 0.05s); background-color: #7986cb; }
+@keyframes dot-win-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+/* Badge hidden by JS logic */
+.item-count-badge { display: none !important; }
+
+.minimalist-dots .animate-pop { animation: dot-pop 0.4s ease-out forwards; }
+.minimalist-dots .animate-shrink { animation: dot-shrink 0.3s ease-out forwards; }

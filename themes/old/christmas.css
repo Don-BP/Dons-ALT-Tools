@@ -1,0 +1,40 @@
+/* --- Christmas Theme --- */
+body.theme-christmas { --body-bg-gradient: linear-gradient(to bottom, #e3f2fd 0%, #bbdefb 100%); background-image: var(--body-bg-gradient); }
+.theme-christmas-card { background: linear-gradient(145deg, #ffffff 60%, #e8f5e9 100%); border: 3px solid #c62828; box-shadow: 0 8px 25px rgba(165, 42, 42, 0.2), 0 0 15px rgba(255, 255, 255, 0.7) inset; }
+.theme-christmas-card .team-name-display .name-text { color: #1b5e20; }
+.theme-christmas-card .team-name-display { background-color: rgba(229, 115, 115, 0.6); }
+
+/* .score-display inherits min-height */
+/* Removed overflow: visible */
+
+.christmas-visual {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center; /* Center lines of gifts */
+    gap: 10px; /* Increased gap */
+    padding: 20px; /* Increased padding */
+    width: 95%;
+    height: 300px; /* Adjusted height */
+    position: relative;
+    margin-bottom: 10px;
+    border: 2px dashed rgba(255,255,255,0.5);
+    border-radius: 10px;
+    background-color: rgba(165, 214, 167, 0.2);
+    overflow-y: auto; /* Allow scrolling if too many gifts */
+}
+.theme-item { font-size: 1.8em; /* Slightly smaller gifts */ transform-origin: center bottom; position: relative; }
+
+/* Theme-specific score number color */
+.theme-christmas-card .score-number { color: #c62828; }
+
+.item-count-badge { position: absolute; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.6); color: #fff; padding: 3px 8px; border-radius: 10px; font-size: 0.9em; display: none; z-index: 15; }
+
+.theme-christmas-card.christmas-winner .christmas-visual { border-style: solid; border-color: gold; }
+.theme-christmas-card.christmas-winner .theme-item { animation: gift-shake 0.5s ease-in-out infinite alternate; animation-delay: calc(var(--item-index, 0) * 0.03s); }
+@keyframes gift-shake { from { transform: rotate(-3deg) scale(1.02); } to { transform: rotate(3deg) scale(1.02); } }
+
+.christmas-visual .animate-pop { animation: gift-pop 0.4s ease-out forwards; }
+.christmas-visual .animate-shrink { animation: gift-shrink 0.3s ease-out forwards; }
+@keyframes gift-pop { 0% { transform: scale(0.5) rotate(-15deg); opacity: 0; } 70% { transform: scale(1.1) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+@keyframes gift-shrink { from { transform: scale(1) rotate(0deg); opacity: 1; } to { transform: scale(0.3) rotate(15deg); opacity: 0; } }
