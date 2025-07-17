@@ -23,6 +23,7 @@ export function initMysteryWord() {
     const endGameMessage = document.getElementById('mw-end-game-message');
     const revealedWord = document.getElementById('mw-revealed-word');
     const playAgainBtn = document.getElementById('mw-play-again-btn');
+    const endGameCloseBtn = toolCard.querySelector('.mw-popup-close'); // New close button
 
     const revealWordBtn = document.getElementById('mw-reveal-word-btn');
     const newGameBtn = document.getElementById('mw-new-game-btn');
@@ -63,8 +64,9 @@ export function initMysteryWord() {
         const progress = (currentMisses - 1) / (maxAllowedMisses - 1);
 
         // Scale the progress across the intermediate visual states (1 to 9).
-        // `1 + progress * 8` maps the progress proportionally between state 1 and state 9.
-        const calculatedState = 1 + Math.round(progress * 8);
+        // Using a multiplier of 9 correctly distributes the misses across the
+        // available states, preventing repeated or skipped images.
+        const calculatedState = 1 + Math.round(progress * 9);
         
         return calculatedState;
     }
@@ -170,8 +172,7 @@ export function initMysteryWord() {
     function renderVisuals() {
         triesDisplay.textContent = `Tries Left: ${maxMisses - misses}`;
         
-        // --- THIS IS THE FIX ---
-        // Call the new function to get the correct image state number.
+        // Call the corrected function to get the right image state number.
         const stateNumber = getDynamicStateNumber(misses, maxMisses);
         visualImage.src = `assets/mystery-word/${currentTheme}/state-${stateNumber}.png`;
         visualImage.alt = `${currentTheme} state ${stateNumber} of 10`;
@@ -263,6 +264,11 @@ export function initMysteryWord() {
     playAgainBtn.addEventListener('click', resetToSetup);
     newGameBtn.addEventListener('click', resetToSetup);
     revealWordBtn.addEventListener('click', revealFullWord);
+
+    // NEW: Add event listener for the popup's close button
+    endGameCloseBtn.addEventListener('click', () => {
+        endGameOverlay.classList.add('hidden');
+    });
 
     toggleWordBtn.addEventListener('click', () => {
         if (wordInput.type === 'password') {

@@ -7,6 +7,44 @@
  * Words use <strong> tags to highlight the focus sound.
  */
 export const phonicsData = {
+    // --- NEW: Alphabet Section ---
+    phase0_alphabet: {
+        name: "Phase 0: The Alphabet",
+        subgroups: {
+            letter_sounds: {
+                name: "Letter Sounds (a-z)",
+                focus: "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z",
+                cards: [
+                    { word: "<strong>A</strong> is for <strong>a</strong>pple", image: "assets/phonics/apple.png", sentence: "A, a, apple." },
+                    { word: "<strong>B</strong> is for <strong>b</strong>all", image: "assets/phonics/ball.png", sentence: "B, b, ball." },
+                    { word: "<strong>C</strong> is for <strong>c</strong>at", image: "assets/phonics/cat.png", sentence: "C, c, cat." },
+                    { word: "<strong>D</strong> is for <strong>d</strong>og", image: "assets/phonics/dog.png", sentence: "D, d, dog." },
+                    { word: "<strong>E</strong> is for <strong>e</strong>gg", image: "assets/phonics/egg.png", sentence: "E, e, egg." },
+                    { word: "<strong>F</strong> is for <strong>f</strong>ish", image: "assets/phonics/fish.png", sentence: "F, f, fish." },
+                    { word: "<strong>G</strong> is for <strong>g</strong>oat", image: "assets/phonics/goat.png", sentence: "G, g, goat." },
+                    { word: "<strong>H</strong> is for <strong>h</strong>and", image: "assets/phonics/hand.png", sentence: "H, h, hand." },
+                    { word: "<strong>I</strong> is for <strong>i</strong>gloo", image: "assets/phonics/igloo.png", sentence: "I, i, igloo." },
+                    { word: "<strong>J</strong> is for <strong>j</strong>uice", image: "assets/phonics/juice.png", sentence: "J, j, juice." },
+                    { word: "<strong>K</strong> is for <strong>k</strong>ey", image: "assets/phonics/key.png", sentence: "K, k, key." },
+                    { word: "<strong>L</strong> is for <strong>l</strong>ion", image: "assets/phonics/lion.png", sentence: "L, l, lion." },
+                    { word: "<strong>M</strong> is for <strong>m</strong>onkey", image: "assets/phonics/monkey.png", sentence: "M, m, monkey." },
+                    { word: "<strong>N</strong> is for <strong>n</strong>ose", image: "assets/phonics/nose.png", sentence: "N, n, nose." },
+                    { word: "<strong>O</strong> is for <strong>o</strong>ctopus", image: "assets/phonics/octopus.png", sentence: "O, o, octopus." },
+                    { word: "<strong>P</strong> is for <strong>p</strong>ig", image: "assets/phonics/pig.png", sentence: "P, p, pig." },
+                    { word: "<strong>Q</strong> is for <strong>q</strong>ueen", image: "assets/phonics/queen.png", sentence: "Q, q, queen." },
+                    { word: "<strong>R</strong> is for <strong>r</strong>ing", image: "assets/phonics/ring.png", sentence: "R, r, ring." },
+                    { word: "<strong>S</strong> is for <strong>s</strong>un", image: "assets/phonics/sun.png", sentence: "S, s, sun." },
+                    { word: "<strong>T</strong> is for <strong>t</strong>in", image: "assets/phonics/tin.png", sentence: "T, t, tin." },
+                    { word: "<strong>U</strong> is for <strong>u</strong>mbrella", image: "assets/phonics/umbrella.png", sentence: "U, u, umbrella." },
+                    { word: "<strong>V</strong> is for <strong>v</strong>iolin", image: "assets/phonics/violin.png", sentence: "V, v, violin." },
+                    { word: "<strong>W</strong> is for <strong>w</strong>atch", image: "assets/phonics/watch.png", sentence: "W, w, watch." },
+                    { word: "<strong>X</strong> is for bo<strong>x</strong>", image: "assets/phonics/box.png", sentence: "X, x, box." },
+                    { word: "<strong>Y</strong> is for <strong>y</strong>o-yo", image: "assets/phonics/yo-yo.png", sentence: "Y, y, yo-yo." },
+                    { word: "<strong>Z</strong> is for <strong>z</strong>ebra", image: "assets/phonics/zebra.png", sentence: "Z, z, zebra." }
+                ]
+            }
+        }
+    },
     // Phase 1: Suitable for Grade 1
     phase1_listening: {
         name: "Phase 1: Listening Skills",
@@ -19,7 +57,7 @@ export const phonicsData = {
                     { word: "kn<strong>o</strong>ck", image: "assets/phonics/knock.png", sentence: "A knock at the door." },
                     { word: "r<strong>i</strong>ng", image: "assets/phonics/ring.png", sentence: "The phone is ringing." },
                     { word: "b<strong>ee</strong>p", image: "assets/phonics/car.png", sentence: "The car horn goes 'beep'." },
-                    { word: "t<strong>i</strong>ck-tock", image: "assets/phonics/clock.png", sentence: "The clock on the wall goes tick-tock." },
+                    { word: "t<strong>i</strong>ck-tock", image: "assets/phonics/tick-tock.png", sentence: "The clock on the wall goes tick-tock." },
                     { word: "b<strong>a</strong>ng", image: "assets/phonics/bang.png", sentence: "The fireworks go bang!" },
                     { word: "dr<strong>i</strong>p", image: "assets/phonics/drip.png", sentence: "The tap goes drip, drip, drip." },
                     { word: "spl<strong>a</strong>sh", image: "assets/phonics/splash.png", sentence: "A big splash in the water." },
