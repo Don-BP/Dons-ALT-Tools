@@ -33,6 +33,43 @@ export function initAnswerMeThis() {
     // --- State ---
     let gameState = {};
     let activeClue = null;
+    let headerResizeObserver = null; 
+    let pointsResizeObserver = null; 
+
+    // --- Font Sizing Functions ---
+    function adjustHeaderTextSize(tile) {
+        const span = tile.querySelector('span');
+        if (!span) return;
+        span.style.whiteSpace = 'normal';
+        let currentSize = 80;
+        span.style.fontSize = `${currentSize}px`;
+        const tileWidth = tile.clientWidth - 20;
+        const tileHeight = tile.clientHeight - 20;
+        while ((span.scrollWidth > tileWidth || span.scrollHeight > tileHeight) && currentSize > 10) {
+            currentSize--;
+            span.style.fontSize = `${currentSize}px`;
+        }
+    }
+
+    // *** START: THIS IS THE FIX (Part 1/2) ***
+    // This function now correctly targets the span inside the point tile.
+    function adjustPointsTextSize(tileFront) {
+        const span = tileFront.querySelector('span');
+        if (!span) return;
+
+        span.style.whiteSpace = 'nowrap';
+        let currentSize = 80;
+        span.style.fontSize = `${currentSize}px`;
+
+        const tileWidth = tileFront.clientWidth - 10;
+        const tileHeight = tileFront.clientHeight - 10;
+
+        while ((span.scrollWidth > tileWidth || span.scrollHeight > tileHeight) && currentSize > 10) {
+            currentSize--;
+            span.style.fontSize = `${currentSize}px`;
+        }
+    }
+    // *** END: THIS IS THE FIX (Part 1/2) ***
 
     // --- Core Functions ---
     function getNewGameState() {
@@ -41,6 +78,8 @@ export function initAnswerMeThis() {
 
     function switchMode(mode) {
         if (mode === 'edit') {
+            if (headerResizeObserver) headerResizeObserver.disconnect();
+            if (pointsResizeObserver) pointsResizeObserver.disconnect();
             playModeContainer.classList.add('hidden');
             editModeContainer.classList.remove('hidden');
             renderEditMode();
@@ -54,7 +93,7 @@ export function initAnswerMeThis() {
     // --- Persistence (UPDATED for IndexedDB) ---
     async function populateLoadGameSelect() {
         try {
-            const games = await getAllJeopardyGames(); // Use new function
+            const games = await getAllJeopardyGames();
             loadGameSelect.innerHTML = '<option value="">-- Select Game --</option>';
             for (const title in games) {
                 const option = document.createElement('option');
@@ -75,7 +114,7 @@ export function initAnswerMeThis() {
         }
         gameState.title = title;
         try {
-            await saveJeopardyGame(title, gameState); // Use new function
+            await saveJeopardyGame(title, gameState);
             alert(`Game "${title}" saved successfully!`);
             await populateLoadGameSelect();
             loadGameSelect.value = title;
@@ -91,7 +130,7 @@ export function initAnswerMeThis() {
             return;
         }
         try {
-            await deleteJeopardyGame(title); // Use new function
+            await deleteJeopardyGame(title);
             alert(`Game "${title}" deleted.`);
             await populateLoadGameSelect();
             if (gameState.title === title) {
@@ -107,7 +146,7 @@ export function initAnswerMeThis() {
         const title = loadGameSelect.value;
         if (!title) return;
         try {
-            const games = await getAllJeopardyGames(); // Use new function
+            const games = await getAllJeopardyGames();
             if (games[title]) {
                 gameState = JSON.parse(JSON.stringify(games[title]));
                 switchMode('edit');
@@ -125,7 +164,7 @@ export function initAnswerMeThis() {
 
     async function handleExport() {
         try {
-            const games = await getAllJeopardyGames(); // Use new function
+            const games = await getAllJeopardyGames();
             if (Object.keys(games).length === 0) {
                 alert("No saved games to export.");
                 return;
@@ -151,7 +190,7 @@ export function initAnswerMeThis() {
         reader.onload = async (e) => {
             try {
                 const importedGames = JSON.parse(e.target.result);
-                await importJeopardyGames(importedGames); // Use new function
+                await importJeopardyGames(importedGames);
                 alert("Games imported successfully!");
                 await populateLoadGameSelect();
             } catch (err) {
@@ -162,8 +201,6 @@ export function initAnswerMeThis() {
         reader.readAsText(file);
         event.target.value = '';
     }
-
-    // --- The rest of the file is identical to the previous version ---
 
     function renderEditMode() {
         gameTitleInput.value = gameState.title || '';
@@ -258,6 +295,9 @@ export function initAnswerMeThis() {
     }
 
     function renderPlayBoard() {
+        if (headerResizeObserver) headerResizeObserver.disconnect();
+        if (pointsResizeObserver) pointsResizeObserver.disconnect();
+
         if (!gameState || !gameState.categories || gameState.categories.length === 0) {
             boardContainer.innerHTML = `
                 <div class="jeopardy-board-placeholder">
@@ -278,7 +318,7 @@ export function initAnswerMeThis() {
         gameState.categories.forEach(cat => {
             const header = document.createElement('div');
             header.className = 'jeopardy-tile header';
-            header.textContent = cat.title;
+            header.innerHTML = `<span>${cat.title}</span>`; 
             board.appendChild(header);
         });
 
@@ -291,12 +331,15 @@ export function initAnswerMeThis() {
                 if (!clue) {
                     tile.innerHTML = '<div class="jeopardy-tile-inner"><div class="jeopardy-tile-back"></div></div>';
                 } else {
+                    // *** START: THIS IS THE FIX (Part 2/2) ***
+                    // The point value is now wrapped in a span.
                     tile.innerHTML = `
                         <div class="jeopardy-tile-inner">
-                            <div class="jeopardy-tile-front">$${clue.points}</div>
+                            <div class="jeopardy-tile-front"><span>$${clue.points}</span></div>
                             <div class="jeopardy-tile-back"></div>
                         </div>
                     `;
+                    // *** END: THIS IS THE FIX (Part 2/2) ***
                     tile.dataset.catIndex = catIdx;
                     tile.dataset.clueIndex = clueIdx;
                     if (clue.revealed) {
@@ -308,6 +351,26 @@ export function initAnswerMeThis() {
         }
         boardContainer.innerHTML = '';
         boardContainer.appendChild(board);
+
+        // Observer for Category Headers
+        headerResizeObserver = new ResizeObserver(entries => {
+            window.requestAnimationFrame(() => {
+                if (!Array.isArray(entries) || !entries.length) return;
+                for (let entry of entries) adjustHeaderTextSize(entry.target);
+            });
+        });
+        const headers = board.querySelectorAll('.jeopardy-tile.header');
+        headers.forEach(header => headerResizeObserver.observe(header));
+
+        // Observer for Point Value Tiles
+        pointsResizeObserver = new ResizeObserver(entries => {
+            window.requestAnimationFrame(() => {
+                if (!Array.isArray(entries) || !entries.length) return;
+                for (let entry of entries) adjustPointsTextSize(entry.target);
+            });
+        });
+        const pointTiles = board.querySelectorAll('.jeopardy-tile-front');
+        pointTiles.forEach(tile => pointsResizeObserver.observe(tile));
     }
     
     function handleTileClick(e) {

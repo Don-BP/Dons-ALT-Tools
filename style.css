@@ -2595,19 +2595,23 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
 .jeopardy-tile.header {
     color: white;
     font-weight: 700;
-    font-size: clamp(1.1em, 2.5vw, 1.8em);
     padding: 10px;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
-    line-height: 1.2;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
     border-bottom: 3px solid #14284d;
     background-image: linear-gradient(rgba(10, 25, 47, 0.6), rgba(10, 25, 47, 0.6)), url('assets/Answer-me-this/bg-1.png');
     background-size: cover;
     background-position: center;
+    overflow: hidden;
 }
+
+.jeopardy-tile.header span {
+    line-height: 1.1;
+}
+
 .jeopardy-tile-inner {
     position: relative;
     width: 100%;
@@ -2637,11 +2641,11 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
 }
 .jeopardy-tile-front {
     color: #FFDE00;
-    font-size: clamp(1.8em, 5vw, 4em);
     text-shadow: 3px 3px 0px #000068, 5px 5px 10px rgba(0,0,0,0.5);
     background-image: linear-gradient(rgba(6, 12, 233, 0.7), rgba(6, 12, 233, 0.7)), url('assets/Answer-me-this/bg-2.png');
     background-size: cover;
     background-position: center;
+    /* font-size is now fully controlled by JavaScript. */
 }
 .jeopardy-tile-back {
     background-color: #1a1a2e;
@@ -2666,7 +2670,6 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     flex-wrap: wrap;
     gap: 10px;
 }
-/* START: NEW STYLES FOR THE LAYOUT CHANGE */
 .jeopardy-edit-toolbar-left {
     display: flex;
     align-items: center;
@@ -2680,7 +2683,6 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
 #jeopardy-add-category-btn:hover {
     background-color: #218838;
 }
-/* END: NEW STYLES FOR THE LAYOUT CHANGE */
 
 .jeopardy-edit-toolbar h3 {
     margin: 0;
@@ -2737,8 +2739,6 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
 .jeopardy-edit-clue textarea { resize: vertical; min-height: 40px; }
 .jeopardy-edit-clue .clue-image-controls { display: flex; align-items: center; gap: 5px; }
 .jeopardy-edit-clue .clue-image-controls img { height: 25px; width: 25px; object-fit: cover; border-radius: 3px; }
-
-/* REMOVED: .jeopardy-edit-controls styles are no longer needed */
 
 /* --- Modal Styles --- */
 @keyframes modal-swoop-in {
@@ -2826,6 +2826,7 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     background-color: white; color: #060CE9; transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
+/* --- End Answer Me This! (Jeopardy) --- */
 /* --- End Answer Me This! (Jeopardy) --- */
 
 /* --- Mystery Word (Hangman) Game --- */

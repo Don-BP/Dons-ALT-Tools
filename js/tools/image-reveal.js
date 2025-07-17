@@ -199,6 +199,48 @@ export function initImageReveal() {
         }
     }
 
+    // *** START: THIS IS THE NEW CODE ***
+    // Add event listener for clicking directly on grid tiles to reveal them.
+    irGridOverlay.addEventListener('click', (e) => {
+        // Only allow clicks during the game on tiles that haven't been revealed yet.
+        const isClickable = (irGameState === 'playing' || irGameState === 'paused') &&
+                            e.target.classList.contains('ir-grid-tile') &&
+                            !e.target.classList.contains('revealed');
+
+        if (!isClickable) {
+            return;
+        }
+
+        const clickedTile = e.target;
+        const allTiles = Array.from(irGridOverlay.children);
+        const tileIndex = allTiles.indexOf(clickedTile);
+
+        // Find the index of the clicked tile in the remaining tiles array.
+        const remainingIndex = irRemainingTiles.indexOf(tileIndex);
+        if (remainingIndex === -1) {
+            // This can happen if the tile was revealed by another mechanism (like the auto-timer)
+            // just before the click was processed. In this case, do nothing.
+            return;
+        }
+
+        // Reveal the tile visually.
+        clickedTile.classList.add('revealed');
+        playSound('sounds/select.mp3');
+
+        // Update the game state by removing the specific tile.
+        irRemainingTiles.splice(remainingIndex, 1);
+
+        // Update the status message.
+        const remainingCount = irRemainingTiles.length;
+        irGameStatus.textContent = remainingCount > 0 ? `${remainingCount} tiles left.` : "Image Revealed!";
+
+        // Check if the game is over.
+        if (remainingCount === 0) {
+            finishImageReveal();
+        }
+    });
+    // *** END: THIS IS THE NEW CODE ***
+
     irStartPauseBtn.addEventListener('click', () => {
         if (irGameState === 'ready') {
             createAndStartGrid();
