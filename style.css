@@ -263,10 +263,9 @@ button:disabled {
     .name-list-collapsible { width: 100%; }
     .name-list-collapsible:not([open]) { flex-grow: 0; }
     
-    /* FIX: Adjust padding for more bottom space and remove gap */
     .tool-card.fullscreen-mode .name-picker-content { 
         flex-direction: column; 
-        padding: 0.5em 0.5em 2em; /* Keep 1em top/sides, add 2em bottom */
+        padding: 1em 1em 2em;
         gap: 0; 
     }
     
@@ -277,24 +276,24 @@ button:disabled {
         flex-grow: 0; 
     }
     
-    /* FIX: Align groups to top and remove internal padding from the display area */
     .tool-card.fullscreen-mode #picked-name { 
         flex-grow: 1; 
         width: 100%; 
         min-height: 200px; 
-        align-items: flex-start;
+        align-items: flex-start; /* Aligns the group container to the top */
         padding: 0; 
     }
     
-    /* FIX: Further reduce gaps and padding for mobile fullscreen */
+    /* This rule now contains the final fix */
     .tool-card.fullscreen-mode .group-all-container { 
         align-items: stretch; 
-        gap: 0.2em; /* Tighter gap between group boxes */
-        padding: 0.2em; /* Tighter padding around the whole container */
+        gap: 0.2em; 
+        padding: 0.2em;
+        align-content: flex-start; /* FIX: Aligns the *rows of groups* to the top */
     }
 
     .tool-card.fullscreen-mode .group-box {
-        padding: 0.3em; /* Reduced padding inside each group box */
+        padding: 0.3em; 
     }
 
     .tool-card.fullscreen-mode .group-box li {
