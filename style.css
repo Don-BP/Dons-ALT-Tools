@@ -244,7 +244,7 @@ button:disabled {
 .group-box ul { list-style-type: none; padding: 0; margin: 0; text-align: center; }
 .group-box li {
     font-size: 1em;
-    padding: 0.2em 0;
+    padding: 0.1em 0;
     font-weight: 500;
     color: var(--text-color);
     white-space: nowrap;
@@ -267,6 +267,12 @@ button:disabled {
     .tool-card.fullscreen-mode #picked-name { flex-grow: 1; width: 100%; min-height: 200px; }
     .tool-card.fullscreen-mode .group-all-container { align-items: stretch; gap: 0.25em; padding: 0.25em; }
 }
+
+    /* FIX: Reduce vertical padding between names in a group on mobile fullscreen */
+    .tool-card.fullscreen-mode .group-box li {
+        padding-top: 0.1em;
+        padding-bottom: 0.1em;
+    }
 
 /* Custom Confirmation Popup for Name Picker */
 #np-confirm-popup { z-index: 1001; }
