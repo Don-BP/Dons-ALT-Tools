@@ -1,6 +1,6 @@
 // js/tools/scoreboard.js
 
-import { playSound } from '../utils.js';
+import { playSound, getScoreboardReturnState, clearScoreboardReturnState } from '../utils.js';
 
 const ThemedScoreboard = {
     // --- Elements ---
@@ -8,7 +8,8 @@ const ThemedScoreboard = {
         toolCard: null, container: null, teamsContainer: null, addTeamBtn: null, removeTeamBtn: null, teamCountDisplay: null,
         themeSelect: null, winScoreInput: null, bonusInput: null, resetBtn: null, winnerPopup: null, winnerName: null,
         winnerAvatar: null, winnerCloseBtn: null, confettiCanvas: null, themeStylesheet: null, gridResetBtn: null,
-        confirmPopup: null, confirmResetBtn: null, cancelResetBtn: null
+        confirmPopup: null, confirmResetBtn: null, cancelResetBtn: null,
+        returnBtn: null // NEW: Return button element
     },
 
     // --- State ---
@@ -55,6 +56,8 @@ const ThemedScoreboard = {
         ELS.confirmPopup = document.getElementById('sb-confirm-popup');
         ELS.confirmResetBtn = document.getElementById('sb-confirm-reset-btn');
         ELS.cancelResetBtn = document.getElementById('sb-cancel-reset-btn');
+        
+        ELS.returnBtn = document.getElementById('sb-return-btn');
 
         this.loadState();
         this.addEventListeners();
@@ -63,6 +66,17 @@ const ThemedScoreboard = {
     
     addEventListeners() {
         const ELS = this.elements;
+
+        ELS.returnBtn.addEventListener('click', () => {
+            const returnToolId = getScoreboardReturnState();
+            if (returnToolId) {
+                this.elements.toolCard.querySelector('.fullscreen-btn')?.click();
+                setTimeout(() => {
+                    document.getElementById(returnToolId)?.querySelector('.fullscreen-btn')?.click();
+                }, 50);
+                clearScoreboardReturnState();
+            }
+        });
 
         ELS.addTeamBtn.addEventListener('click', () => this.changeTeamCount(1));
         ELS.removeTeamBtn.addEventListener('click', () => this.changeTeamCount(-1));
@@ -131,7 +145,7 @@ const ThemedScoreboard = {
             reader.onload = (e) => {
                 this.state.teamAvatars[teamId] = e.target.result;
                 this.renderAllViews();
-                this.saveState(); // Ensure avatar change is saved
+                this.saveState();
             };
             reader.readAsDataURL(file);
         }
@@ -150,7 +164,7 @@ const ThemedScoreboard = {
                 this.state.activeTheme = loaded.activeTheme || 'default';
                 this.state.scores = loaded.scores || {};
                 this.state.teamNames = loaded.teamNames || {};
-                this.state.teamAvatars = loaded.teamAvatars || {}; // Correctly load avatars
+                this.state.teamAvatars = loaded.teamAvatars || {};
             } catch (e) {
                 console.error("Failed to load or parse state, resetting:", e);
                 this.state.scores = {};
@@ -159,7 +173,6 @@ const ThemedScoreboard = {
             }
         }
         
-        // Ensure all team structures exist up to the max, preserving loaded data
         for (let i = 1; i <= this.CONFIG.MAX_TEAMS; i++) {
             if (this.state.scores[i] === undefined) this.state.scores[i] = 0;
             if (this.state.teamNames[i] === undefined) this.state.teamNames[i] = this.CONFIG.DEFAULT_NAMES[i - 1];
@@ -175,7 +188,7 @@ const ThemedScoreboard = {
             activeTheme: this.state.activeTheme,
             scores: this.state.scores,
             teamNames: this.state.teamNames,
-            teamAvatars: this.state.teamAvatars, // Ensure avatars are in the saved state
+            teamAvatars: this.state.teamAvatars,
             isGameActive: this.state.isGameActive,
         };
         try {
@@ -185,7 +198,11 @@ const ThemedScoreboard = {
 
     activate() {
         this.elements.container.classList.remove('hidden');
-        this.setTheme(this.state.activeTheme, false); // Don't play sound on activation
+        this.setTheme(this.state.activeTheme, false);
+
+        // Enable or disable the return button based on state, but always let CSS handle visibility.
+        const returnToolId = getScoreboardReturnState();
+        this.elements.returnBtn.disabled = !returnToolId;
     },
     
     deactivate() {
@@ -513,7 +530,7 @@ const ThemedScoreboard = {
                 const visual = visualContainer.querySelector('.christmas-visual');
                 const gifts = ['🎁', '🎀', '🎄'];
                 const currentCount = visual.children.length;
-                if (score > currentCount) { for (let i = currentCount; i < score; i++) { const item = document.createElement('div'); item.className = 'gift theme-item animate-pop'; item.innerHTML = gifts[Math.floor(Math.random() * gifts.length)]; visual.appendChild(item); } }
+                if (score > currentCount) { for (let i = currentCount; i < score; i++) { const item = document.createElement('div'); item.className = 'gift theme-item animate-pop'; item.innerHTML = gifts[Math.floor(Math.random() * 3)]; visual.appendChild(item); } }
                 else if (score < currentCount) { const childrenToRemove = Array.from(visual.children).slice(score); childrenToRemove.forEach(child => { child.classList.add('animate-shrink'); child.addEventListener('animationend', (e) => e.target.remove(), { once: true }); }); }
             },
             win(card, isWinner) { card.classList.toggle('christmas-winner', isWinner); if (isWinner) card.querySelectorAll('.gift').forEach(el => el.classList.add('dancing')); }

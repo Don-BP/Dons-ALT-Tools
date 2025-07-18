@@ -1,19 +1,24 @@
 // js/tools/bingo-picker.js
 
-import { getAvailableFlashcardDecks, playSound } from '../utils.js';
+import { getAvailableFlashcardDecks, playSound, setScoreboardReturnState } from '../utils.js';
 
 export function initBingoPicker() {
+    // --- DOM Elements ---
+    const toolCard = document.getElementById('bingo-tool');
     const bingoListSelect = document.getElementById('bingo-list-select');
     const bingoListInput = document.getElementById('bingo-list-input');
     const bingoPickBtn = document.getElementById('bingo-pick-btn');
     const bingoResetBtn = document.getElementById('bingo-reset-btn');
+    const goToScoreboardBtn = document.getElementById('bingo-goto-scoreboard-btn'); // New Button
     const bingoPickedItemDisplay = document.getElementById('bingo-picked-item-display');
     const bingoPickedContainer = document.getElementById('bingo-picked-container');
     const bingoPickedList = document.getElementById('bingo-picked-list');
 
+    // --- State ---
     let bingoPool = [];
     let bingoPickedItems = [];
 
+    // --- Core Functions ---
     function renderBingoPickedList() {
         bingoPickedList.innerHTML = '';
         bingoPickedItems.forEach(item => {
@@ -62,7 +67,6 @@ export function initBingoPicker() {
         } else if (selectedSource) {
             const allDecks = await getAvailableFlashcardDecks();
             const deck = allDecks[selectedSource] || [];
-            // THE FIX IS HERE
             bingoPool = [...deck].filter(card => !card.muted && ((card.text && card.text.trim() !== '') || card.image));
         }
         
@@ -90,9 +94,10 @@ export function initBingoPicker() {
         
         updateBingoDisplay(pickedItem);
         renderBingoPickedList();
-        playSound('sounds/select.mp3');
+        playSound('assets/sounds/select.mp3');
     }
 
+    // --- Event Listeners ---
     bingoPickBtn.addEventListener('click', pickBingoItem);
     bingoResetBtn.addEventListener('click', resetBingo);
     bingoListSelect.addEventListener('change', resetBingo);
@@ -102,6 +107,30 @@ export function initBingoPicker() {
         }
     });
 
-    // Initial setup
+    // New listener for the scoreboard button
+    goToScoreboardBtn.addEventListener('click', () => {
+        // 1. Set the state so the scoreboard knows where to return.
+        setScoreboardReturnState('bingo-tool');
+
+        const scoreboardCard = document.getElementById('scoreboard-tool');
+        const scoreboardFullscreenBtn = scoreboardCard?.querySelector('.fullscreen-btn');
+
+        // Check if Bingo Picker is currently in fullscreen mode.
+        if (toolCard.classList.contains('fullscreen-mode')) {
+            // If so, exit our own fullscreen first, then enter the scoreboard's.
+            const bingoFullscreenBtn = toolCard.querySelector('.fullscreen-btn');
+            bingoFullscreenBtn?.click();
+            
+            setTimeout(() => {
+                scoreboardFullscreenBtn?.click();
+            }, 50);
+        } else {
+            // If we are in grid view, we can go straight to the scoreboard's fullscreen.
+            scoreboardFullscreenBtn?.click();
+        }
+    });
+
+
+    // --- Initial setup ---
     resetBingo();
 }

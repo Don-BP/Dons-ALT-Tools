@@ -1,20 +1,25 @@
 // js/tools/whats-missing.js
 
-import { getAvailableFlashcardDecks, playSound } from '../utils.js';
+import { getAvailableFlashcardDecks, playSound, setScoreboardReturnState } from '../utils.js';
 
 export function initWhatsMissing() {
+    // --- DOM Elements ---
+    const toolCard = document.getElementById('whats-missing-tool'); // Get the tool card
     const wmCategorySelect = document.getElementById('whats-missing-category');
     const wmGrid = document.getElementById('whats-missing-grid');
     const wmStatus = document.getElementById('whats-missing-status');
     const wmStartBtn = document.getElementById('whats-missing-start-btn');
+    const goToScoreboardBtn = document.getElementById('wm-goto-scoreboard-btn'); // New Scoreboard Button
     const wmDifficultySelect = document.getElementById('whats-missing-difficulty');
     const wmCardCountSelect = document.getElementById('wm-card-count');
     const wmCustomCardCountInput = document.getElementById('wm-custom-card-count');
     const wmMissingCountSelect = document.getElementById('wm-missing-count');
 
+    // --- State ---
     let wmMissingItems = [];
     let wmGameState = 'idle'; // idle, showing, hiding, revealed
 
+    // --- Core Functions ---
     function wmRevealAnswer() {
         if (wmGameState !== 'hiding') return;
 
@@ -26,7 +31,7 @@ export function initWhatsMissing() {
             card.classList.add('revealed');
         });
 
-        playSound('sounds/reveal.mp3');
+        playSound('assets/sounds/reveal.mp3');
         
         const missingNames = wmMissingItems.map(item => item.text || '[Image Only]').join(', ');
         if (wmMissingItems.length > 1) {
@@ -40,7 +45,6 @@ export function initWhatsMissing() {
     }
 
     async function wmStartGame() {
-        // Determine the number of cards, checking for custom input
         let cardCount;
         if (wmCardCountSelect.value === 'custom') {
             cardCount = parseInt(wmCustomCardCountInput.value, 10);
@@ -57,7 +61,7 @@ export function initWhatsMissing() {
         const category = wmCategorySelect.value;
         const allDecks = await getAvailableFlashcardDecks();
         const rawDeck = allDecks[category] ? [...allDecks[category]] : [];
-        const deck = rawDeck.filter(card => !card.muted); // THE FIX IS HERE
+        const deck = rawDeck.filter(card => !card.muted);
 
         if (!category) {
             wmStatus.textContent = 'Please select a category first!';
@@ -82,9 +86,8 @@ export function initWhatsMissing() {
         wmStartBtn.disabled = true;
         wmGrid.innerHTML = '';
 
-        // Dynamically set grid layout instead of using fixed CSS classes
-        wmGrid.className = 'whats-missing-grid';
         const cols = Math.ceil(Math.sqrt(cardCount));
+        wmGrid.className = 'whats-missing-grid';
         wmGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
         for (let i = deck.length - 1; i > 0; i--) {
@@ -131,12 +134,29 @@ export function initWhatsMissing() {
         }, difficultySettings[wmDifficultySelect.value] || 4000);
     }
 
+    // --- Event Listeners ---
     wmStartBtn.addEventListener('click', wmStartGame);
     wmGrid.addEventListener('click', wmRevealAnswer);
 
-    // Event listener to show/hide the custom input field
     wmCardCountSelect.addEventListener('change', () => {
         const isCustom = wmCardCountSelect.value === 'custom';
         wmCustomCardCountInput.classList.toggle('hidden', !isCustom);
+    });
+
+    // New listener for the scoreboard button
+    goToScoreboardBtn.addEventListener('click', () => {
+        // 1. Set the state for return functionality.
+        setScoreboardReturnState('whats-missing-tool');
+
+        const scoreboardCard = document.getElementById('scoreboard-tool');
+        const scoreboardFullscreenBtn = scoreboardCard?.querySelector('.fullscreen-btn');
+
+        // 2. Since this button is only visible in fullscreen, we always exit first.
+        const wmFullscreenBtn = toolCard.querySelector('.fullscreen-btn');
+        wmFullscreenBtn?.click();
+        
+        setTimeout(() => {
+            scoreboardFullscreenBtn?.click();
+        }, 50);
     });
 }

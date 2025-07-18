@@ -262,11 +262,25 @@
         </div>
 
         <!-- Digital Flashcards -->
-        <div class="tool-card">
+        <div class="tool-card" id="flashcards-tool-card-id">
             <h2>Digital Flashcards</h2>
-            <div class="flashcard-controls">
-                <label for="flashcard-category">Category:</label>
-                <select id="flashcard-category"></select>
+            <div class="flashcard-top-bar">
+                <div class="flashcard-nav">
+                    <div class="flashcard-nav-single">
+                        <button id="flashcard-prev">⬅️</button>
+                        <button id="flashcard-random">Random</button>
+                        <button id="flashcard-next">➡️</button>
+                    </div>
+                    <div class="flashcard-nav-toggle">
+                        <button id="flashcard-show-all-toggle">Show All</button>
+                    </div>
+                    <div class="flashcard-controls">
+                        <label for="flashcard-category">Category:</label>
+                        <select id="flashcard-category"></select>
+                    </div>
+                    <!-- THIS IS THE NEW BUTTON -->
+                    <button id="fc-goto-scoreboard-btn" title="Go to Scoreboard">🏅</button>
+                </div>
             </div>
             <div id="flashcard-display-container">
                 <div id="flashcard-display">
@@ -275,16 +289,6 @@
                 </div>
             </div>
             <div id="flashcard-grid-view"></div>
-            <div class="flashcard-nav">
-                <div class="flashcard-nav-single">
-                    <button id="flashcard-prev">⬅️</button>
-                    <button id="flashcard-random">Random</button>
-                    <button id="flashcard-next">➡️</button>
-                </div>
-                <div class="flashcard-nav-toggle">
-                    <button id="flashcard-show-all-toggle">Show All</button>
-                </div>
-            </div>
         </div>
 
         <!-- Simple Scoreboard -->
@@ -348,7 +352,9 @@
                 <button id="reset-scores">Reset Scores</button>
             </div>
             <div id="themed-scoreboard-container" class="hidden">
-                 <div class="scoreboard-fullscreen-controls">
+                <!-- The "hidden" class is REMOVED from this button -->
+                <button id="sb-return-btn" title="Return to Previous Tool">↩️</button>
+                <div class="scoreboard-fullscreen-controls">
                     <div class="sb-control-group">
                         <label>Teams:</label>
                         <button id="sb-remove-team-btn" title="Remove Team">🔽</button>
@@ -406,7 +412,7 @@
         </div>
         
         <!-- What's Missing? Game -->
-        <div class="tool-card">
+        <div class="tool-card" id="whats-missing-tool">
             <h2>What's Missing? Game</h2>
             <div class="wm-settings">
                 <div class="flashcard-controls">
@@ -442,10 +448,12 @@
                         <option value="4">4 Cards</option>
                     </select>
                 </div>
+                <button id="whats-missing-start-btn">Start</button>
+                <!-- THIS IS THE NEW BUTTON -->
+                <button id="wm-goto-scoreboard-btn" title="Go to Scoreboard">🏅</button>
             </div>
             <div id="whats-missing-status">Select a category and start the game!</div>
             <div class="whats-missing-grid" id="whats-missing-grid"></div>
-            <button id="whats-missing-start-btn">Start Game</button>
         </div>
 
         <!-- Image Reveal Game -->
@@ -479,14 +487,17 @@
                  <div class="ir-custom-speed-input hidden">
                     <input type="number" id="ir-custom-speed" placeholder="Sec" min="0.1" step="0.1" value="2"> s
                 </div>
+                <!-- The button has been MOVED from here -->
             </div>
             <div class="ir-game-controls">
                 <button id="ir-start-pause-btn" class="hidden">Start</button>
-                <button id="ir-manual-reveal-btn" class="hidden">Reveal Tile</button>
-                <button id="ir-reveal-all-btn" class="hidden">Reveal All</button>
-                <button id="ir-reset-grid-btn" class="hidden">Reset Grid</button>
+                <button id="ir-manual-reveal-btn" class="hidden">Open Tile</button>
+                <button id="ir-reveal-all-btn" class="hidden">Answer</button>
+                <button id="ir-reset-grid-btn" class="hidden">Reset</button>
                 <button id="ir-next-image-btn" class="hidden">Next Image</button>
                 <button id="ir-new-game-btn" class="hidden">New Game</button>
+                <!-- THIS IS THE NEW LOCATION for the button -->
+                <button id="ir-goto-scoreboard-btn" class="hidden" title="Go to Scoreboard">🏅</button>
             </div>
             <div class="ir-game-area">
                 <div id="ir-image-container">
@@ -506,8 +517,10 @@
             <div class="jeopardy-container">
                 <div id="jeopardy-play-mode">
                     <div class="jeopardy-play-controls">
-                        <button id="jeopardy-edit-game-btn">Edit Game</button>
-                        <button id="jeopardy-new-game-btn">New Blank Game</button>
+                        <button id="jeopardy-edit-game-btn">Edit</button>
+                        <button id="jeopardy-new-game-btn">New Game</button>
+                        <!-- THIS IS THE NEW BUTTON -->
+                        <button id="jeopardy-goto-scoreboard-btn" title="Go to Scoreboard">🏅</button>
                         <div class="jeopardy-load-game-wrapper">
                              <label for="jeopardy-load-select">Load Saved Game:</label>
                              <select id="jeopardy-load-select">
@@ -524,12 +537,10 @@
                 </div>
                 <div id="jeopardy-edit-mode" class="hidden">
                     <div class="jeopardy-edit-toolbar">
-                        <!-- START: THIS IS THE CHANGE -->
                         <div class="jeopardy-edit-toolbar-left">
                             <h3>Game Editor</h3>
                             <button id="jeopardy-add-category-btn">+ Add Category</button>
                         </div>
-                        <!-- END: THIS IS THE CHANGE -->
                         <div class="jeopardy-edit-actions">
                              <input type="text" id="jeopardy-game-title-input" placeholder="Enter Game Name to Save...">
                              <button id="jeopardy-save-game-btn">💾 Save</button>
@@ -541,7 +552,6 @@
                         </div>
                     </div>
                     <div id="jeopardy-edit-area"></div>
-                    <!-- The bottom controls div has been removed -->
                 </div>
             </div>
 
@@ -566,17 +576,21 @@
         <div class="tool-card" id="bingo-tool">
             <h2>Bingo Picker</h2>
             <div class="bingo-controls-panel">
-                 <div class="bingo-source-select">
-                    <label for="bingo-list-select">Use List From:</label>
-                    <select id="bingo-list-select">
-                        <option value="custom">-- Custom List Below --</option>
-                    </select>
+                 <div class="bingo-top-controls">
+                    <div class="bingo-source-select">
+                        <label for="bingo-list-select">Use List From:</label>
+                        <select id="bingo-list-select">
+                            <option value="custom">-- Custom List Below --</option>
+                        </select>
+                    </div>
+                    <div class="bingo-buttons">
+                        <button id="bingo-pick-btn">Card</button>
+                        <button id="bingo-reset-btn">Reset</button>
+                        <!-- THIS IS THE NEW BUTTON -->
+                        <button id="bingo-goto-scoreboard-btn" title="Go to Scoreboard">🏅</button>
+                    </div>
                 </div>
                 <textarea id="bingo-list-input" placeholder="Or, enter items here, one per line..."></textarea>
-                <div class="bingo-buttons">
-                    <button id="bingo-pick-btn">Pick an Item</button>
-                    <button id="bingo-reset-btn">Reset Game</button>
-                </div>
             </div>
             <div class="bingo-display-area">
                 <div id="bingo-picked-item-display">BINGO!</div>
@@ -630,8 +644,10 @@
                         <div id="mw-word-display"></div>
                         <div id="mw-keyboard"></div>
                         <div id="mw-game-actions">
-                            <button id="mw-reveal-word-btn">Reveal Word</button>
-                            <button id="mw-new-game-btn">New Game</button>
+                            <button id="mw-reveal-word-btn">Answer</button>
+                            <button id="mw-new-game-btn">Reset</button>
+                            <!-- The "hidden" class is REMOVED from this button -->
+                            <button id="mw-goto-scoreboard-btn" title="Go to Scoreboard">🏅</button>
                         </div>
                     </div>
                 </div>

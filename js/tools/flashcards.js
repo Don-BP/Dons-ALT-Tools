@@ -1,8 +1,9 @@
 // js/tools/flashcards.js
 
-import { getAvailableFlashcardDecks } from '../utils.js';
+import { getAvailableFlashcardDecks, setScoreboardReturnState } from '../utils.js'; // Import scoreboard state function
 
 export function initFlashcards() {
+    // --- DOM Elements ---
     const flashcardTool = document.querySelector('.tool-card:has(#flashcard-category)');
     const categorySelect = document.getElementById('flashcard-category');
     const displayContainer = document.getElementById('flashcard-display-container');
@@ -13,14 +14,16 @@ export function initFlashcards() {
     const randomBtn = document.getElementById('flashcard-random');
     const nextBtn = document.getElementById('flashcard-next');
     const toggleBtn = document.getElementById('flashcard-show-all-toggle');
+    const goToScoreboardBtn = document.getElementById('fc-goto-scoreboard-btn'); // New Scoreboard Button
 
-
+    // --- State ---
     let currentDeck = [];
     let currentIndex = 0;
     let activeFace = 'front';
     let isGridView = false;
     let resizeObserver;
 
+    // --- Core Functions ---
     function renderGridView() {
         gridViewContainer.innerHTML = '';
         if (currentDeck.length === 0) {
@@ -28,13 +31,8 @@ export function initFlashcards() {
             return;
         }
         
-        // --- CHANGE START ---
-        // Check the fullscreen state at the time of rendering.
         const isFullscreen = flashcardTool.classList.contains('fullscreen-mode');
-        // --- CHANGE END ---
 
-
-        // Function to calculate best grid layout
         const calculateAndApplyOptimalGrid = () => {
             if (!isGridView || !gridViewContainer.isConnected) return;
             const containerWidth = gridViewContainer.clientWidth;
@@ -42,12 +40,12 @@ export function initFlashcards() {
             if (containerWidth === 0 || containerHeight === 0) return;
 
             let bestLayout = { cols: 1, rows: currentDeck.length, cardSize: 0 };
-            const cardAspectRatio = 4 / 3; // Assume a standard 4:3 aspect ratio for calculation
+            const cardAspectRatio = 4 / 3;
 
             for (let cols = 1; cols <= currentDeck.length; cols++) {
                 const rows = Math.ceil(currentDeck.length / cols);
-                const cardWidth = (containerWidth / cols) - 10; // Account for gap
-                const cardHeight = (containerHeight / rows) - 10; // Account for gap
+                const cardWidth = (containerWidth / cols) - 10;
+                const cardHeight = (containerHeight / rows) - 10;
                 
                 let potentialCardWidth;
                 if (cardWidth / cardAspectRatio > cardHeight) {
@@ -65,7 +63,6 @@ export function initFlashcards() {
             gridViewContainer.style.gridTemplateRows = `repeat(${bestLayout.rows}, 1fr)`;
         };
 
-        // Create and append all cards to the grid with flip structure
         currentDeck.forEach(cardData => {
             const cardEl = document.createElement('div');
             cardEl.className = 'flashcard-grid-item';
@@ -81,10 +78,7 @@ export function initFlashcards() {
             const randomBack = Math.ceil(Math.random() * 2);
             backEl.style.backgroundImage = `url('assets/flashcards/card-back${randomBack}.png')`;
             
-            // --- CHANGE START ---
-            // Apply different rendering logic based on the fullscreen state.
             if (isFullscreen) {
-                // In fullscreen, always show both image and text if they exist.
                 if (cardData.image) {
                     const img = document.createElement('img');
                     img.src = cardData.image;
@@ -97,33 +91,28 @@ export function initFlashcards() {
                     frontEl.appendChild(text);
                 }
             } else {
-                // Not in fullscreen, apply the "image-only" rule.
                 if (cardData.image) {
                     const img = document.createElement('img');
                     img.src = cardData.image;
                     img.alt = cardData.text || 'Flashcard Image';
                     frontEl.appendChild(img);
                 } else if (cardData.text) {
-                    // This 'else if' ensures text only shows if there is NO image.
                     const text = document.createElement('div');
                     text.textContent = cardData.text;
                     frontEl.appendChild(text);
                 }
             }
-            // --- CHANGE END ---
 
             innerEl.appendChild(frontEl);
             innerEl.appendChild(backEl);
             cardEl.appendChild(innerEl);
             gridViewContainer.appendChild(cardEl);
 
-            // Add click listener to the card for flipping
             cardEl.addEventListener('click', () => {
                 cardEl.classList.toggle('is-flipped');
             });
         });
 
-        // Initial calculation and set up observer to auto-resize
         calculateAndApplyOptimalGrid();
         if (resizeObserver) resizeObserver.disconnect();
         resizeObserver = new ResizeObserver(calculateAndApplyOptimalGrid);
@@ -140,15 +129,14 @@ export function initFlashcards() {
         } else {
             toggleBtn.textContent = 'Show All';
             if (resizeObserver) resizeObserver.disconnect();
-            showCard(true); // Re-render the single card view
+            showCard(true);
         }
     }
-
 
     async function loadCategory(category) {
         const allDecks = await getAvailableFlashcardDecks();
         const rawDeck = allDecks[category] ? JSON.parse(JSON.stringify(allDecks[category])) : [];
-        currentDeck = rawDeck.filter(card => !card.muted); // THE FIX IS HERE
+        currentDeck = rawDeck.filter(card => !card.muted);
         currentIndex = 0;
         
         if (isGridView) {
@@ -206,12 +194,9 @@ export function initFlashcards() {
         }
     }
 
-    // --- CHANGE START ---
-    // This observer will automatically re-render the grid when entering/exiting fullscreen
     const fullscreenObserver = new MutationObserver((mutations) => {
         for (let mutation of mutations) {
             if (mutation.attributeName === 'class') {
-                // If we are in grid view when the fullscreen class changes, re-render the grid
                 if (isGridView) {
                     renderGridView();
                 }
@@ -219,9 +204,8 @@ export function initFlashcards() {
         }
     });
     fullscreenObserver.observe(flashcardTool, { attributes: true });
-    // --- CHANGE END ---
 
-
+    // --- Event Listeners ---
     toggleBtn.addEventListener('click', toggleView);
     categorySelect.addEventListener('change', (e) => loadCategory(e.target.value));
     nextBtn.addEventListener('click', () => {
@@ -242,6 +226,30 @@ export function initFlashcards() {
         showCard();
     });
     
+    // New listener for the scoreboard button
+    goToScoreboardBtn.addEventListener('click', () => {
+        // 1. Set the state for return functionality.
+        setScoreboardReturnState('flashcards-tool-card-id'); // NOTE: We need to add an ID to the tool card in index.html
+
+        const scoreboardCard = document.getElementById('scoreboard-tool');
+        const scoreboardFullscreenBtn = scoreboardCard?.querySelector('.fullscreen-btn');
+
+        // 2. Check if Flashcards tool is currently in fullscreen mode.
+        if (flashcardTool.classList.contains('fullscreen-mode')) {
+            // If so, exit our own fullscreen first, then enter the scoreboard's.
+            const fcFullscreenBtn = flashcardTool.querySelector('.fullscreen-btn');
+            fcFullscreenBtn?.click();
+            
+            setTimeout(() => {
+                scoreboardFullscreenBtn?.click();
+            }, 50);
+        } else {
+            // If we are in grid view, we can go straight to the scoreboard's fullscreen.
+            scoreboardFullscreenBtn?.click();
+        }
+    });
+
+    // --- Init ---
     if (categorySelect.value) {
         loadCategory(categorySelect.value);
     }

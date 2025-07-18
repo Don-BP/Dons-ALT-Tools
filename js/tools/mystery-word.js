@@ -1,6 +1,6 @@
 // js/tools/mystery-word.js
 
-import { playSound } from '../utils.js';
+import { playSound, setScoreboardReturnState } from '../utils.js';
 
 export function initMysteryWord() {
     // --- DOM Elements ---
@@ -23,10 +23,11 @@ export function initMysteryWord() {
     const endGameMessage = document.getElementById('mw-end-game-message');
     const revealedWord = document.getElementById('mw-revealed-word');
     const playAgainBtn = document.getElementById('mw-play-again-btn');
-    const endGameCloseBtn = toolCard.querySelector('.mw-popup-close'); // New close button
+    const endGameCloseBtn = toolCard.querySelector('.mw-popup-close');
 
     const revealWordBtn = document.getElementById('mw-reveal-word-btn');
     const newGameBtn = document.getElementById('mw-new-game-btn');
+    const goToScoreboardBtn = document.getElementById('mw-goto-scoreboard-btn');
     const confettiCanvas = document.getElementById('mw-confetti-canvas');
 
 
@@ -40,40 +41,14 @@ export function initMysteryWord() {
 
     // --- Core Functions ---
 
-    /**
-     * **NEW DYNAMIC STATE CALCULATION FUNCTION**
-     * Maps the current number of misses to the appropriate visual state number (0-10)
-     * to ensure a smooth progression regardless of the maxMisses setting.
-     * @param {number} currentMisses - The number of incorrect guesses made so far.
-     * @param {number} maxAllowedMisses - The total number of misses allowed.
-     * @returns {number} The visual state number to display (e.g., for state-5.png, returns 5).
-     */
     function getDynamicStateNumber(currentMisses, maxAllowedMisses) {
-        // State 0 is for the initial view before any misses.
-        if (currentMisses === 0) {
-            return 0;
-        }
-        // If the player has used all their misses, show the final losing state.
-        if (currentMisses >= maxAllowedMisses) {
-            return 10;
-        }
-
-        // Calculate the proportion of "progress" towards losing.
-        // We use (currentMisses - 1) because the first miss is a distinct step.
-        // We map the remaining (maxAllowedMisses - 1) misses across the 9 available image states (1-9).
+        if (currentMisses === 0) return 0;
+        if (currentMisses >= maxAllowedMisses) return 10;
         const progress = (currentMisses - 1) / (maxAllowedMisses - 1);
-
-        // Scale the progress across the intermediate visual states (1 to 9).
-        // Using a multiplier of 9 correctly distributes the misses across the
-        // available states, preventing repeated or skipped images.
         const calculatedState = 1 + Math.round(progress * 9);
-        
         return calculatedState;
     }
 
-    /**
-     * Resets the game to its initial setup state.
-     */
     function resetToSetup() {
         gameState = 'setup';
         secretWord = '';
@@ -94,9 +69,6 @@ export function initMysteryWord() {
         toggleWordBtn.textContent = 'Show';
     }
 
-    /**
-     * Starts a new game with the current settings.
-     */
     function startGame() {
         secretWord = wordInput.value.trim(); 
         if (!secretWord) {
@@ -119,9 +91,6 @@ export function initMysteryWord() {
         renderVisuals();
     }
 
-    /**
-     * Generates the on-screen keyboard buttons.
-     */
     function generateKeyboard() {
         keyboard.innerHTML = '';
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -135,9 +104,6 @@ export function initMysteryWord() {
         }
     }
 
-    /**
-     * Renders the secret word display with blanks and guessed letters.
-     */
     function renderWord() {
         wordDisplay.innerHTML = '';
         let allLettersGuessed = true;
@@ -166,22 +132,14 @@ export function initMysteryWord() {
         }
     }
     
-    /**
-     * Updates the visual theme and tries count based on the number of misses.
-     */
     function renderVisuals() {
         triesDisplay.textContent = `Tries Left: ${maxMisses - misses}`;
         
-        // Call the corrected function to get the right image state number.
         const stateNumber = getDynamicStateNumber(misses, maxMisses);
         visualImage.src = `assets/mystery-word/${currentTheme}/state-${stateNumber}.png`;
         visualImage.alt = `${currentTheme} state ${stateNumber} of 10`;
     }
 
-    /**
-     * Processes a player's guess from the on-screen keyboard.
-     * @param {string} letter - The letter that was guessed (always uppercase).
-     */
     function handleGuess(letter) {
         if (gameState !== 'playing' || guessedLetters.has(letter)) {
             return;
@@ -205,10 +163,6 @@ export function initMysteryWord() {
         }
     }
     
-    /**
-     * Handles the win or lose state of the game.
-     * @param {boolean} didWin - True if the player won, false if they lost.
-     */
     function handleEndGame(didWin) {
         gameState = didWin ? 'win' : 'lose';
         
@@ -226,9 +180,6 @@ export function initMysteryWord() {
         endGameOverlay.classList.remove('hidden');
     }
 
-    /**
-     * Instantly reveals the full word and ends the game with a win.
-     */
     function revealFullWord() {
         if (gameState !== 'playing') return;
         for (const char of secretWord) {
@@ -239,9 +190,6 @@ export function initMysteryWord() {
         renderWord();
     }
     
-    /**
-     * Triggers a confetti animation on the dedicated canvas.
-     */
     function triggerConfetti() {
         if (typeof confetti !== 'function') return;
         
@@ -265,7 +213,6 @@ export function initMysteryWord() {
     newGameBtn.addEventListener('click', resetToSetup);
     revealWordBtn.addEventListener('click', revealFullWord);
 
-    // NEW: Add event listener for the popup's close button
     endGameCloseBtn.addEventListener('click', () => {
         endGameOverlay.classList.add('hidden');
     });
@@ -277,6 +224,30 @@ export function initMysteryWord() {
         } else {
             wordInput.type = 'password';
             toggleWordBtn.textContent = 'Show';
+        }
+    });
+
+    // --- THIS IS THE FIX ---
+    goToScoreboardBtn.addEventListener('click', () => {
+        // 1. Set the state so the scoreboard knows where to return.
+        setScoreboardReturnState('mystery-word-tool');
+
+        const scoreboardCard = document.getElementById('scoreboard-tool');
+        const scoreboardFullscreenBtn = scoreboardCard?.querySelector('.fullscreen-btn');
+
+        // Check if Mystery Word is currently in fullscreen mode.
+        if (toolCard.classList.contains('fullscreen-mode')) {
+            // If so, exit our own fullscreen first, then enter the scoreboard's.
+            const mysteryWordFullscreenBtn = toolCard.querySelector('.fullscreen-btn');
+            mysteryWordFullscreenBtn?.click();
+
+            // A small delay allows the DOM to update before the next action.
+            setTimeout(() => {
+                scoreboardFullscreenBtn?.click();
+            }, 50);
+        } else {
+            // If we are in grid view, we can go straight to the scoreboard's fullscreen.
+            scoreboardFullscreenBtn?.click();
         }
     });
 

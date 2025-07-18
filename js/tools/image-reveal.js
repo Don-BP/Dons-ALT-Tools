@@ -1,8 +1,9 @@
 // js/tools/image-reveal.js
 
-import { playSound } from '../utils.js';
+import { playSound, setScoreboardReturnState } from '../utils.js';
 
 export function initImageReveal() {
+    // --- DOM Elements ---
     const irTool = document.getElementById('image-reveal-tool');
     const irImageInput = document.getElementById('ir-image-input');
     const irGridSizeSelect = document.getElementById('ir-grid-size');
@@ -19,6 +20,7 @@ export function initImageReveal() {
     const irResetGridBtn = document.getElementById('ir-reset-grid-btn');
     const irNextImageBtn = document.getElementById('ir-next-image-btn');
     const irNewGameBtn = document.getElementById('ir-new-game-btn');
+    const goToScoreboardBtn = document.getElementById('ir-goto-scoreboard-btn'); // Reference to the moved button
 
     const irImageContainer = document.getElementById('ir-image-container');
     const irImage = document.getElementById('ir-image');
@@ -39,11 +41,12 @@ export function initImageReveal() {
         irImage.src = '';
         irImage.style.visibility = 'hidden';
         irGridOverlay.innerHTML = '';
-        irImageContainer.style.aspectRatio = 'auto'; // Reset aspect ratio
+        irImageContainer.style.aspectRatio = 'auto';
 
         irGameStatus.textContent = 'Upload an image to begin!';
         irSequenceStatus.textContent = '';
 
+        // This line now correctly hides the scoreboard button along with all other game controls.
         irTool.querySelectorAll('.ir-game-controls button').forEach(btn => btn.classList.add('hidden'));
         irTool.querySelector('.ir-setup-controls').classList.remove('hidden');
 
@@ -56,7 +59,6 @@ export function initImageReveal() {
         irCurrentImageIndex = imageIndex;
         irGameState = 'ready';
 
-        // Use a temporary image object to get its natural dimensions and set aspect ratio
         const tempImg = new Image();
         tempImg.onload = () => {
             irImageContainer.style.aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
@@ -81,13 +83,11 @@ export function initImageReveal() {
         }
         irGameStatus.textContent = 'Ready to play!';
 
-        // CHANGE 1: DO NOT hide the setup controls here. Let them be visible when the game is 'ready'.
-        // irTool.querySelector('.ir-setup-controls').classList.add('hidden'); // This line was removed.
-
         irTool.querySelector('.ir-game-controls').classList.remove('hidden');
         irStartPauseBtn.textContent = 'Start';
         irStartPauseBtn.classList.remove('hidden');
         irNewGameBtn.classList.remove('hidden');
+        goToScoreboardBtn.classList.remove('hidden'); // <<< THIS IS THE KEY CHANGE
         irResetGridBtn.classList.add('hidden');
         irManualRevealBtn.classList.add('hidden');
         irRevealAllBtn.classList.add('hidden');
@@ -118,7 +118,6 @@ export function initImageReveal() {
     });
 
     function createAndStartGrid() {
-        // CHANGE 2: The setup controls are now hidden when the game ACTUALLY starts.
         irTool.querySelector('.ir-setup-controls').classList.add('hidden');
         irImage.style.visibility = 'visible';
 
@@ -175,7 +174,7 @@ export function initImageReveal() {
         const tile = irGridOverlay.children[tileIndex];
         if (tile) {
             tile.classList.add('revealed');
-            playSound('sounds/select.mp3');
+            playSound('assets/sounds/select.mp3');
         }
         const remaining = irRemainingTiles.length;
         irGameStatus.textContent = remaining > 0 ? `${remaining} tiles left.` : "Image Revealed!";
@@ -187,7 +186,7 @@ export function initImageReveal() {
     function finishImageReveal() {
         irGameState = 'finished';
         clearInterval(irRevealInterval);
-        playSound('sounds/reveal.mp3');
+        playSound('assets/sounds/reveal.mp3');
         irGameStatus.textContent = "Image Revealed! Well done!";
         irStartPauseBtn.classList.add('hidden');
         irManualRevealBtn.classList.add('hidden');
@@ -199,10 +198,7 @@ export function initImageReveal() {
         }
     }
 
-    // *** START: THIS IS THE NEW CODE ***
-    // Add event listener for clicking directly on grid tiles to reveal them.
     irGridOverlay.addEventListener('click', (e) => {
-        // Only allow clicks during the game on tiles that haven't been revealed yet.
         const isClickable = (irGameState === 'playing' || irGameState === 'paused') &&
                             e.target.classList.contains('ir-grid-tile') &&
                             !e.target.classList.contains('revealed');
@@ -215,31 +211,23 @@ export function initImageReveal() {
         const allTiles = Array.from(irGridOverlay.children);
         const tileIndex = allTiles.indexOf(clickedTile);
 
-        // Find the index of the clicked tile in the remaining tiles array.
         const remainingIndex = irRemainingTiles.indexOf(tileIndex);
         if (remainingIndex === -1) {
-            // This can happen if the tile was revealed by another mechanism (like the auto-timer)
-            // just before the click was processed. In this case, do nothing.
             return;
         }
 
-        // Reveal the tile visually.
         clickedTile.classList.add('revealed');
-        playSound('sounds/select.mp3');
+        playSound('assets/sounds/select.mp3');
 
-        // Update the game state by removing the specific tile.
         irRemainingTiles.splice(remainingIndex, 1);
 
-        // Update the status message.
         const remainingCount = irRemainingTiles.length;
         irGameStatus.textContent = remainingCount > 0 ? `${remainingCount} tiles left.` : "Image Revealed!";
 
-        // Check if the game is over.
         if (remainingCount === 0) {
             finishImageReveal();
         }
     });
-    // *** END: THIS IS THE NEW CODE ***
 
     irStartPauseBtn.addEventListener('click', () => {
         if (irGameState === 'ready') {
@@ -265,19 +253,16 @@ export function initImageReveal() {
         irRemainingTiles = [];
         finishImageReveal();
     });
-
-    // CHANGE 3: This is the fully corrected logic for the Reset Grid button.
+    
     irResetGridBtn.addEventListener('click', () => {
         clearInterval(irRevealInterval);
         irGridOverlay.innerHTML = '';
-        irImage.style.visibility = 'hidden'; // <-- THIS IS THE FIX
+        irImage.style.visibility = 'hidden';
 
         irGameState = 'ready';
 
-        // Show the setup controls again
         irTool.querySelector('.ir-setup-controls').classList.remove('hidden');
         
-        // Reset the game buttons to the 'ready' state
         updateUIForReadyState();
     });
 
@@ -293,9 +278,26 @@ export function initImageReveal() {
         irCustomGridInputs.classList.toggle('hidden', irGridSizeSelect.value !== 'custom');
     });
 
-    // *** THIS IS THE CORRECTED LINE ***
     irRevealModeSelect.addEventListener('change', () => {
         irCustomSpeedInputContainer.classList.toggle('hidden', irRevealModeSelect.value !== 'custom');
+    });
+
+    goToScoreboardBtn.addEventListener('click', () => {
+        setScoreboardReturnState('image-reveal-tool');
+
+        const scoreboardCard = document.getElementById('scoreboard-tool');
+        const scoreboardFullscreenBtn = scoreboardCard?.querySelector('.fullscreen-btn');
+
+        if (irTool.classList.contains('fullscreen-mode')) {
+            const irFullscreenBtn = irTool.querySelector('.fullscreen-btn');
+            irFullscreenBtn?.click();
+            
+            setTimeout(() => {
+                scoreboardFullscreenBtn?.click();
+            }, 50);
+        } else {
+            scoreboardFullscreenBtn?.click();
+        }
     });
 
     resetImageRevealTool();

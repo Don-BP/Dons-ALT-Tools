@@ -1,16 +1,17 @@
 // js/tools/answer-me-this.js
 
-import { playSound } from '../utils.js';
-// UPDATED: Import the new, specific DB functions
+import { playSound, setScoreboardReturnState } from '../utils.js'; // Import the scoreboard state function
 import { saveJeopardyGame, getAllJeopardyGames, deleteJeopardyGame, importJeopardyGames } from '../db.js';
 
 export function initAnswerMeThis() {
     // --- DOM Elements ---
+    const toolCard = document.getElementById('jeopardy-tool'); // Get the tool card itself
     const playModeContainer = document.getElementById('jeopardy-play-mode');
     const editModeContainer = document.getElementById('jeopardy-edit-mode');
     const boardContainer = document.getElementById('jeopardy-board-container');
     const editGameBtn = document.getElementById('jeopardy-edit-game-btn');
     const newGameBtn = document.getElementById('jeopardy-new-game-btn');
+    const goToScoreboardBtn = document.getElementById('jeopardy-goto-scoreboard-btn'); // New Scoreboard Button
     const loadGameSelect = document.getElementById('jeopardy-load-select');
     const gameTitleInput = document.getElementById('jeopardy-game-title-input');
     const saveGameBtn = document.getElementById('jeopardy-save-game-btn');
@@ -51,8 +52,6 @@ export function initAnswerMeThis() {
         }
     }
 
-    // *** START: THIS IS THE FIX (Part 1/2) ***
-    // This function now correctly targets the span inside the point tile.
     function adjustPointsTextSize(tileFront) {
         const span = tileFront.querySelector('span');
         if (!span) return;
@@ -69,7 +68,6 @@ export function initAnswerMeThis() {
             span.style.fontSize = `${currentSize}px`;
         }
     }
-    // *** END: THIS IS THE FIX (Part 1/2) ***
 
     // --- Core Functions ---
     function getNewGameState() {
@@ -90,7 +88,7 @@ export function initAnswerMeThis() {
         }
     }
 
-    // --- Persistence (UPDATED for IndexedDB) ---
+    // --- Persistence ---
     async function populateLoadGameSelect() {
         try {
             const games = await getAllJeopardyGames();
@@ -331,15 +329,12 @@ export function initAnswerMeThis() {
                 if (!clue) {
                     tile.innerHTML = '<div class="jeopardy-tile-inner"><div class="jeopardy-tile-back"></div></div>';
                 } else {
-                    // *** START: THIS IS THE FIX (Part 2/2) ***
-                    // The point value is now wrapped in a span.
                     tile.innerHTML = `
                         <div class="jeopardy-tile-inner">
                             <div class="jeopardy-tile-front"><span>$${clue.points}</span></div>
                             <div class="jeopardy-tile-back"></div>
                         </div>
                     `;
-                    // *** END: THIS IS THE FIX (Part 2/2) ***
                     tile.dataset.catIndex = catIdx;
                     tile.dataset.clueIndex = clueIdx;
                     if (clue.revealed) {
@@ -352,7 +347,6 @@ export function initAnswerMeThis() {
         boardContainer.innerHTML = '';
         boardContainer.appendChild(board);
 
-        // Observer for Category Headers
         headerResizeObserver = new ResizeObserver(entries => {
             window.requestAnimationFrame(() => {
                 if (!Array.isArray(entries) || !entries.length) return;
@@ -362,7 +356,6 @@ export function initAnswerMeThis() {
         const headers = board.querySelectorAll('.jeopardy-tile.header');
         headers.forEach(header => headerResizeObserver.observe(header));
 
-        // Observer for Point Value Tiles
         pointsResizeObserver = new ResizeObserver(entries => {
             window.requestAnimationFrame(() => {
                 if (!Array.isArray(entries) || !entries.length) return;
@@ -436,6 +429,29 @@ export function initAnswerMeThis() {
             clueImageContainer.classList.remove('hidden');
         }
         revealQuestionBtn.classList.add('hidden');
+    });
+    
+    // New listener for the scoreboard button
+    goToScoreboardBtn.addEventListener('click', () => {
+        // 1. Set the state so the scoreboard knows where to return.
+        setScoreboardReturnState('jeopardy-tool');
+
+        const scoreboardCard = document.getElementById('scoreboard-tool');
+        const scoreboardFullscreenBtn = scoreboardCard?.querySelector('.fullscreen-btn');
+
+        // Check if Answer Me This is currently in fullscreen mode.
+        if (toolCard.classList.contains('fullscreen-mode')) {
+            // If so, exit our own fullscreen first, then enter the scoreboard's.
+            const amtFullscreenBtn = toolCard.querySelector('.fullscreen-btn');
+            amtFullscreenBtn?.click();
+            
+            setTimeout(() => {
+                scoreboardFullscreenBtn?.click();
+            }, 50);
+        } else {
+            // If we are in grid view, we can go straight to the scoreboard's fullscreen.
+            scoreboardFullscreenBtn?.click();
+        }
     });
 
     // --- Init ---

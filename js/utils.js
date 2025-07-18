@@ -7,8 +7,38 @@ let isMuted = false;
 export const CUSTOM_FLASHCARDS_KEY = 'brainPowerCustomFlashcards_DEPRECATED';
 export const builtInFlashcardData = {};
 
-// ** THE FIX IS HERE **: A central place to hold the live, in-memory state from the manager.
+// A central place to hold the live, in-memory state from the manager.
 let liveFlashcardSet = { name: null, cards: [] };
+
+// --- NEW: Scoreboard Return State ---
+let scoreboardReturnState = {
+    fromToolId: null
+};
+
+/**
+ * NEW: Sets the tool ID to return to from the scoreboard.
+ * @param {string} toolId - The ID of the tool card to return to (e.g., 'mystery-word-tool').
+ */
+export function setScoreboardReturnState(toolId) {
+    scoreboardReturnState.fromToolId = toolId;
+}
+
+/**
+ * NEW: Gets the tool ID to return to.
+ * @returns {string|null} The tool ID or null if not set.
+ */
+export function getScoreboardReturnState() {
+    return scoreboardReturnState.fromToolId;
+}
+
+/**
+ * NEW: Clears the return state.
+ */
+export function clearScoreboardReturnState() {
+    scoreboardReturnState.fromToolId = null;
+}
+// --- END: Scoreboard Return State ---
+
 
 /**
  * Allows the flashcard manager to update the live, in-memory version of a deck.
@@ -51,7 +81,7 @@ export async function getAvailableFlashcardDecks() {
     const customDecks = await getAllSets();
     const allDecks = { ...builtInFlashcardData, ...customDecks };
 
-    // 2. ** THE FIX IS HERE **: If a deck is being edited live, overwrite the version from storage.
+    // 2. If a deck is being edited live, overwrite the version from storage.
     if (liveFlashcardSet.name) {
         // Use JSON stringify/parse for a deep copy to prevent other modules
         // from accidentally mutating the manager's live state.

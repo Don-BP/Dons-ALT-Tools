@@ -82,6 +82,41 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* --- New Cross-Module Button Styles --- */
+
+/* Style for the "Go to Scoreboard" button in Mystery Word */
+#mw-goto-scoreboard-btn {
+    /* No longer hidden by default. Its visibility is controlled by its parent container (#mw-game-container). */
+    padding: 8px 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    min-width: auto;
+    margin-left: 10px;
+}
+
+/* Style for the "Return" button in Scoreboard */
+#sb-return-btn {
+    display: none; /* Hide by default in grid view */
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 1500;
+    background-color: #f0ad4e; /* Yellow */
+    color: white;
+    padding: 10px 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 1px solid rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+#sb-return-btn:hover {
+    background-color: #eea236;
+}
+/* Show the button only when the scoreboard is in fullscreen */
+.tool-card.fullscreen-mode #sb-return-btn {
+    display: block;
+}
+
 /* --- Random Name Picker --- */
 .name-picker-content {
     display: flex;
@@ -690,6 +725,15 @@ button:disabled {
 #pug-food-container { width: 100%; height: 100%; position: relative; }
 
 /* --- Digital Flashcards --- */
+#fc-goto-scoreboard-btn {
+    padding: 10px 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    min-width: auto;
+    margin: 5px; /* Use same margin as other buttons for consistency */
+}
+
+
 #flashcard-display-container {
     width: 90%;
     flex-grow: 1; 
@@ -729,7 +773,6 @@ button:disabled {
     z-index: 2; /* Ensure the active card is on top */
 }
 .tool-card.fullscreen-mode #flashcard-display-container {
-    height: 60vh; 
     height: auto; 
     flex-grow: 1;
     font-size: 1.5em;
@@ -743,30 +786,26 @@ button:disabled {
 .whats-missing-card span {
     font-size: 1em;
 }
-.flashcard-controls {
+
+/* --- THIS IS THE CORRECTED LAYOUT LOGIC --- */
+
+/* The main top row container */
+.flashcard-top-bar {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* Align the single control group to the left */
     align-items: center;
-    gap: 10px;
-}
-#flashcard-category {
-    padding: 5px;
-    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 1em; /* Space between controls and the card display */
 }
 
+/* Container for all controls, now grouped together */
 .flashcard-nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    width: 100%;
+    gap: 1em; /* Space between button groups and category selector */
+    flex-wrap: wrap; /* Allow all controls to wrap on small screens */
 }
-/* Fix for button alignment in grid view */
-.tool-card.grid-view-active .flashcard-nav {
-    justify-content: flex-end;
-}
-
-/* --- Grid View & Flip Animation Styles --- */
+/* Individual button groups */
 .flashcard-nav-single, .flashcard-nav-toggle {
     display: flex;
     gap: 10px;
@@ -777,6 +816,19 @@ button:disabled {
 #flashcard-show-all-toggle:hover {
     background-color: #4a9d4a;
 }
+
+/* Container for the category dropdown */
+.flashcard-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#flashcard-category {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* --- Grid View & Flip Animation Styles --- */
 #flashcard-grid-view {
     width: 90%;
     flex-grow: 1;
@@ -785,10 +837,15 @@ button:disabled {
     display: grid;
     gap: 10px;
 }
-.tool-card.grid-view-active #flashcard-display-container,
+/* Hide the single card view when grid is active */
+.tool-card.grid-view-active #flashcard-display-container {
+    display: none;
+}
+/* Hide the prev/random/next buttons when grid is active */
 .tool-card.grid-view-active .flashcard-nav-single {
     display: none;
 }
+/* Hide the grid view when it's NOT active */
 .tool-card:not(.grid-view-active) #flashcard-grid-view {
     display: none;
 }
@@ -855,20 +912,16 @@ button:disabled {
 }
 
 /* --- Mobile styles for flashcard navigation --- */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+    /* On small screens, center the controls and let them stack */
+    .flashcard-top-bar {
+        justify-content: center;
+    }
     .flashcard-nav {
         justify-content: center;
-        flex-wrap: wrap;
-        gap: 5px; /* Tighter gap between button groups */
-    }
-    .flashcard-nav-single, .flashcard-nav-toggle {
-        gap: 5px; /* Tighter gap between buttons */
-    }
-    .flashcard-nav button {
-        padding: 8px 10px; /* Smaller button padding */
-        font-size: 0.9em;
     }
 }
+/* --- Digital Flashcard End --- */
 
 /* --- Original Scoreboard Styles (Grid View) --- */
 .scoreboard-grid-view .scoreboard-teams {
@@ -1279,6 +1332,20 @@ button:disabled {
 }
 
 /* --- What's Missing Game --- */
+#wm-goto-scoreboard-btn {
+    display: none; /* Hide by default in grid view */
+    padding: 10px 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    min-width: auto;
+}
+
+/* Show the button ONLY when the tool is in fullscreen mode */
+.tool-card.fullscreen-mode #wm-goto-scoreboard-btn {
+    display: inline-block;
+}
+
+
 #whats-missing-status {
     font-weight: bold;
     min-height: 24px;
@@ -1342,6 +1409,15 @@ button:disabled {
 }
 
 /* --- Image Reveal Game --- */
+#ir-goto-scoreboard-btn {
+    padding: 10px 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    min-width: auto;
+    margin: 0; /* Let the parent flex gap handle spacing */
+}
+
+
 .ir-setup-controls {
     display: flex;
     flex-wrap: wrap;
@@ -1428,11 +1504,53 @@ button:disabled {
 }
 
 /* --- Bingo Picker --- */
-.bingo-controls-panel { width: 100%; text-align: center; flex-shrink: 0; margin-bottom: 1em; }
-.bingo-source-select { margin-bottom: 0.5em; }
-#bingo-list-select { width: 100%; max-width: 400px; padding: 5px; border-radius: 5px; }
-#bingo-list-input { width: 100%; max-width: 400px; height: 100px; margin-bottom: 1em; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-.bingo-buttons { display: flex; gap: 10px; justify-content: center; }
+#bingo-goto-scoreboard-btn {
+    padding: 10px 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    min-width: auto;
+}
+
+
+.bingo-controls-panel {
+    width: 100%;
+    flex-shrink: 0;
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.bingo-top-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    margin-bottom: 0.5em;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.bingo-source-select {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+#bingo-list-select {
+    padding: 8px;
+    border-radius: 5px;
+}
+#bingo-list-input {
+    width: 100%;
+    max-width: 500px;
+    height: 100px;
+    margin-bottom: 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.bingo-buttons {
+    display: flex;
+    gap: 10px;
+}
 .bingo-display-area {
     display: flex;
     flex-direction: column;
@@ -2521,6 +2639,15 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
 /* --- End Phonics Styles --- */
 
 /* --- Answer Me This! (Jeopardy) --- */
+#jeopardy-goto-scoreboard-btn {
+    padding: 10px 12px;
+    font-size: 1.2em;
+    line-height: 1;
+    min-width: auto;
+    margin: 0;
+}
+
+
 .jeopardy-container {
     width: 100%;
     flex-grow: 1;
@@ -2827,7 +2954,6 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 /* --- End Answer Me This! (Jeopardy) --- */
-/* --- End Answer Me This! (Jeopardy) --- */
 
 /* --- Mystery Word (Hangman) Game --- */
 .mw-container {
@@ -3015,13 +3141,12 @@ body.has-fullscreen-tool .tool-container > .tool-card:not(.fullscreen-mode) {
     font-size: 2.5em;
 }
 
-/* START: New styles for revealed word and close button */
 p#mw-revealed-word {
-    font-size: 2.2em; /* Much larger */
-    color: var(--team2-color); /* Red for emphasis */
+    font-size: 2.2em;
+    color: var(--team2-color);
     margin: 0.5em 0 1em 0;
     font-weight: bold;
-    word-break: break-word; /* Ensure long phrases can wrap */
+    word-break: break-word;
 }
 .mw-popup-close {
     position: absolute;
@@ -3041,7 +3166,6 @@ p#mw-revealed-word {
     color: var(--primary-color);
     background: none;
 }
-/* END: New styles */
 
 #mw-confetti-canvas {
     position: absolute;
@@ -3113,45 +3237,38 @@ p#mw-revealed-word {
 
     /* --- THIS IS THE DEFINITIVE FIX --- */
 
-    /* 1. The VISUAL AREA (image) will shrink, but has a minimum size. */
+    /* 1. The VISUAL AREA (image) is now the primary flexible element.
+       It will grow to fill all available space. */
     .tool-card.fullscreen-mode #mw-visual-area {
-        flex: 1 0 100px; /* It can grow, won't shrink below its basis of 100px. */
+        flex-grow: 1;
+        flex-shrink: 1; /* Allow it to shrink if needed */
+        min-height: 100px; /* Give it a minimum height */
     }
     
-    /* 2. The GAME AREA is now a flex container for its children.
-       This is the container that holds the word, keyboard, and buttons. */
+    /* 2. The GAME AREA should NOT grow or shrink. Its height will be
+       determined by the natural height of its content (word, keyboard, buttons). */
     .tool-card.fullscreen-mode #mw-game-area {
-        flex: 1 1 auto;     /* Let it be flexible */
-        min-height: 0;      /* CRITICAL: Allows this container to shrink below its content's natural height. */
-        display: flex;
-        flex-direction: column;
-        gap: 0.5em;         /* Tighter gap for mobile */
+        flex-grow: 0;
+        flex-shrink: 0; 
+        /* The following properties from the old fix are REMOVED:
+           flex: 1 1 auto;
+           min-height: 0; 
+        */
     }
     
-    /* 3. Make the TRIES display not shrink. */
-    .tool-card.fullscreen-mode #mw-tries-display {
-        flex-shrink: 0;
-    }
-
-    /* 4. The WORD DISPLAY is the *only* part that grows and has a scrollbar. */
+    /* 3. The WORD DISPLAY no longer needs to be flexible or scrollable.
+       It will just take up as much vertical space as the blanks require. */
     .tool-card.fullscreen-mode #mw-word-display {
-        flex: 1 1 auto;    /* It will grow and shrink to fill space within #mw-game-area */
-        overflow-y: auto;  /* A scrollbar appears if words take up too much vertical space */
-        min-height: 50px;
-        padding: 5px; 
-        border: 1px solid var(--secondary-color);
-        border-radius: var(--border-radius);
-    }
-    
-    /* 5. The KEYBOARD and ACTION BUTTONS are protected from shrinking. */
-    .tool-card.fullscreen-mode #mw-keyboard,
-    .tool-card.fullscreen-mode #mw-game-actions {
-        flex-shrink: 0;
+        padding: 0.5em 0; /* Add a little vertical space for aesthetics */
+        /* The following properties from the old fix are REMOVED:
+           flex: 1 1 auto;
+           overflow-y: auto;
+        */
     }
 
     /* --- END OF FIX --- */
 
-    /* These existing sizing rules for letters are still correct. */
+    /* Sizing rules for letters on mobile */
     .tool-card.fullscreen-mode .mw-word-wrapper {
         gap: 5px;
     }
@@ -3162,7 +3279,7 @@ p#mw-revealed-word {
         border-bottom-width: 3px;
     }
     .tool-card.fullscreen-mode #mw-word-display {
-        gap: 5px 15px; /* Spacing between letters/words */
+        gap: 5px 15px;
     }
 }
 /* --- End Mystery Word (Hangman) Game --- */
