@@ -266,7 +266,7 @@ button:disabled {
     /* FIX: Adjust padding for more bottom space and remove gap */
     .tool-card.fullscreen-mode .name-picker-content { 
         flex-direction: column; 
-        padding: 1em 1em 2em; /* Keep 1em top/sides, add 2em bottom */
+        padding: 0.5em 0.5em 2em; /* Keep 1em top/sides, add 2em bottom */
         gap: 0; 
     }
     
