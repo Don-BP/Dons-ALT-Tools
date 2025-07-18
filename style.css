@@ -262,12 +262,30 @@ button:disabled {
 @media (max-width: 768px) {
     .name-list-collapsible { width: 100%; }
     .name-list-collapsible:not([open]) { flex-grow: 0; }
-    .tool-card.fullscreen-mode .name-picker-content { flex-direction: column; padding: 1em; gap: 1em; }
-    .tool-card.fullscreen-mode .name-picker-panel { flex-basis: auto; height: auto; width: 100%; flex-grow: 0; }
-    .tool-card.fullscreen-mode #picked-name { flex-grow: 1; width: 100%; min-height: 200px; }
-    .tool-card.fullscreen-mode .group-all-container { align-items: stretch; gap: 0.25em; padding: 0.25em; }
-}
-
+    
+    /* FIX: Remove the gap between the control panel and the display area */
+    .tool-card.fullscreen-mode .name-picker-content { 
+        flex-direction: column; 
+        padding: 1em; 
+        gap: 0; 
+    }
+    
+    .tool-card.fullscreen-mode .name-picker-panel { 
+        flex-basis: auto; 
+        height: auto; 
+        width: 100%; 
+        flex-grow: 0; 
+    }
+    
+    /* FIX: Align groups to top and remove internal padding from the display area */
+    .tool-card.fullscreen-mode #picked-name { 
+        flex-grow: 1; 
+        width: 100%; 
+        min-height: 200px; 
+        align-items: flex-start;
+        padding: 0; 
+    }
+    
     /* FIX: Further reduce gaps and padding for mobile fullscreen */
     .tool-card.fullscreen-mode .group-all-container { 
         align-items: stretch; 
@@ -283,7 +301,7 @@ button:disabled {
         padding-top: 0.1em;
         padding-bottom: 0.1em;
     }
-
+}
 
 /* Custom Confirmation Popup for Name Picker */
 #np-confirm-popup { z-index: 1001; }
