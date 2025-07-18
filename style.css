@@ -264,10 +264,14 @@ button:disabled {
     .name-list-collapsible:not([open]) { flex-grow: 0; }
     .tool-card.fullscreen-mode .name-picker-content { flex-direction: column; padding: 1em; gap: 1em; }
     .tool-card.fullscreen-mode .name-picker-panel { flex-basis: auto; height: auto; width: 100%; flex-grow: 0; }
-    .tool-card.fullscreen-mode #picked-name { flex-grow: 1; width: 100%; min-height: 200px; }
-    .tool-card.fullscreen-mode .group-all-container { align-items: stretch; gap: 0.25em; padding: 0.25em; }
-}
-
+    
+    .tool-card.fullscreen-mode #picked-name { 
+        flex-grow: 1; 
+        width: 100%; 
+        min-height: 200px; 
+        align-items: flex-start; /* FIX: Align groups to the top */
+    }
+    
     /* FIX: Further reduce gaps and padding for mobile fullscreen */
     .tool-card.fullscreen-mode .group-all-container { 
         align-items: stretch; 
